@@ -5,28 +5,12 @@ import Image from 'next/image'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [showHeader, setShowHeader] = useState(true)
-  const [lastScrollY, setLastScrollY] = useState(0)
+  // Removi showHeader e lastScrollY, pois não são mais necessários
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      const threshold = 200
-      if (currentScrollY <= threshold) {
-        setShowHeader(true)
-      } else if (currentScrollY > lastScrollY) {
-        setShowHeader(false)
-      } else {
-        setShowHeader(true)
-      }
-      setLastScrollY(currentScrollY)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [lastScrollY])
+  // Removi o useEffect relacionado ao scroll
 
   return (
-    <header className={`bg-gray-100/95 backdrop-blur-sm shadow-lg fixed w-full top-0 z-50 border-b border-gray-300 transition-transform duration-300 ${showHeader ? 'translate-y-0' : '-translate-y-full'}`}>
+    <header className="bg-gray-100/95 backdrop-blur-sm shadow-lg fixed w-full top-0 z-50 border-b border-gray-300 transition-transform duration-300 translate-y-0">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-3">
           {/* Logo */}
