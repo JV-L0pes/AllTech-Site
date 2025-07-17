@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
 
 export default function TestimonialsSection() {
-  const [currentTestimonial, setCurrentTestimonial] = useState(0)
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   const testimonials = [
     {
@@ -13,70 +13,74 @@ export default function TestimonialsSection() {
       company: "TechCorp Solutions",
       avatar: "MS",
       rating: 5,
-      testimonial: "Excelente equipe, nos ajudou muito na migração para Office 365. Tivemos resultados excelentes na produtividade da nossa equipe. O suporte é sempre rápido e eficiente.",
-      result: "↗️ 40% aumento na produtividade"
+      testimonial:
+        "Excelente equipe, nos ajudou muito na migração para Office 365. Tivemos resultados excelentes na produtividade da nossa equipe. O suporte é sempre rápido e eficiente.",
+      result: "↗️ 40% aumento na produtividade",
     },
     {
       id: 2,
-      name: "Carlos Oliveira", 
+      name: "Carlos Oliveira",
       position: "CEO",
       company: "Innovate Solutions",
       avatar: "CO",
       rating: 5,
-      testimonial: "A AllTech desde o início nos deu todo suporte necessário na implementação do Azure. Sempre que me perguntam sobre consultoria em tecnologia, eu indico sem hesitar.",
-      result: "💰 35% redução de custos"
+      testimonial:
+        "A AllTech desde o início nos deu todo suporte necessário na implementação do Azure. Sempre que me perguntam sobre consultoria em tecnologia, eu indico sem hesitar.",
+      result: "💰 35% redução de custos",
     },
     {
       id: 3,
       name: "Ana Silva",
-      position: "Gerente de Projetos", 
+      position: "Gerente de Projetos",
       company: "DataFlow Systems",
       avatar: "AS",
       rating: 5,
-      testimonial: "É uma excelente empresa, com pessoas altamente capacitadas. Gosto do cuidado com o atendimento e do serviço que conseguem prestar. O comprometimento da equipe se solidifica com os ótimos resultados.",
-      result: "⚡ 60% automação de processos"
+      testimonial:
+        "É uma excelente empresa, com pessoas altamente capacitadas. Gosto do cuidado com o atendimento e do serviço que conseguem prestar. O comprometimento da equipe se solidifica com os ótimos resultados.",
+      result: "⚡ 60% automação de processos",
     },
     {
       id: 4,
       name: "Roberto Lima",
       position: "CTO",
       company: "SmartBusiness Ltd",
-      avatar: "RL", 
+      avatar: "RL",
       rating: 5,
-      testimonial: "O treinamento em Power Platform foi fundamental para nossa equipe. Agora conseguimos criar soluções internas sem depender de terceiros. ROI fantástico!",
-      result: "🚀 50% mais agilidade"
-    }
-  ]
+      testimonial:
+        "O treinamento em Power Platform foi fundamental para nossa equipe. Agora conseguimos criar soluções internas sem depender de terceiros. ROI fantástico!",
+      result: "🚀 50% mais agilidade",
+    },
+  ];
 
   const stats = [
     {
       number: "99.9%",
       label: "Uptime",
-      description: "Disponibilidade garantida"
+      description: "Disponibilidade garantida",
     },
     {
-      number: "150+", 
+      number: "150+",
       label: "Projetos",
-      description: "Entregues com sucesso"
+      description: "Entregues com sucesso",
     },
     {
       number: "50+",
       label: "Empresas",
-      description: "Atendidas em todo Brasil"
-    }
-  ]
+      description: "Atendidas em todo Brasil",
+    },
+  ];
 
   // Auto-slide a cada 6 segundos
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
-    }, 6000)
-    return () => clearInterval(timer)
-  }, [testimonials.length])
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [testimonials.length]);
 
   const goToTestimonial = (index: number) => {
-    setCurrentTestimonial(index)
-  }
+    setCurrentTestimonial(index);
+  };
 
   return (
     <section id="depoimentos" className="section-padding bg-gray-100">
@@ -87,24 +91,25 @@ export default function TestimonialsSection() {
             O que nossos <span className="text-gradient">clientes dizem</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Veja os resultados reais que nossos clientes conquistaram 
-            com nossas soluções tecnológicas
+            Veja os resultados reais que nossos clientes conquistaram com nossas
+            soluções tecnológicas
           </p>
         </div>
 
         {/* Estatísticas */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           {stats.map((stat, index) => (
-            <div key={index} className="text-center bg-gray-50 rounded-xl p-6 border border-gray-300 shadow-sm">
+            <div
+              key={index}
+              className="text-center bg-gray-50 rounded-xl p-6 border border-gray-300 shadow-sm"
+            >
               <div className="text-4xl lg:text-5xl font-bold text-gradient mb-2">
                 {stat.number}
               </div>
               <div className="text-xl font-semibold text-gray-900 mb-2">
                 {stat.label}
               </div>
-              <div className="text-gray-500 text-sm">
-                {stat.description}
-              </div>
+              <div className="text-gray-500 text-sm">{stat.description}</div>
             </div>
           ))}
         </div>
@@ -114,20 +119,24 @@ export default function TestimonialsSection() {
           <div className="bg-gray-50 rounded-2xl p-8 lg:p-12 border border-gray-300 shadow-lg">
             {/* Aspas decorativas */}
             <div className="text-6xl text-blue-500/30 mb-6">"</div>
-            
+
             {/* Conteúdo do depoimento */}
             <div className="relative">
               {testimonials.map((testimonial, index) => (
                 <div
                   key={testimonial.id}
                   className={`transition-opacity duration-500 ${
-                    index === currentTestimonial ? 'opacity-100' : 'opacity-0 absolute inset-0'
+                    index === currentTestimonial
+                      ? "opacity-100"
+                      : "opacity-0 absolute inset-0"
                   }`}
                 >
                   {/* Estrelas */}
                   <div className="flex justify-center gap-1 mb-6">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <span key={i} className="text-yellow-400 text-xl">★</span>
+                      <span key={i} className="text-yellow-400 text-xl">
+                        ★
+                      </span>
                     ))}
                   </div>
 
@@ -168,13 +177,20 @@ export default function TestimonialsSection() {
           {/* Controles de navegação */}
           <div className="flex justify-center gap-4 mt-8">
             <button
-              onClick={() => goToTestimonial((currentTestimonial - 1 + testimonials.length) % testimonials.length)}
+              onClick={() =>
+                goToTestimonial(
+                  (currentTestimonial - 1 + testimonials.length) %
+                    testimonials.length
+                )
+              }
               className="w-12 h-12 bg-gray-50 hover:bg-white rounded-full flex items-center justify-center text-gray-600 transition-colors duration-200 border border-gray-300 shadow-sm"
             >
               ‹
             </button>
             <button
-              onClick={() => goToTestimonial((currentTestimonial + 1) % testimonials.length)}
+              onClick={() =>
+                goToTestimonial((currentTestimonial + 1) % testimonials.length)
+              }
               className="w-12 h-12 bg-gray-50 hover:bg-white rounded-full flex items-center justify-center text-gray-600 transition-colors duration-200 border border-gray-300 shadow-sm"
             >
               ›
@@ -188,9 +204,9 @@ export default function TestimonialsSection() {
                 key={index}
                 onClick={() => goToTestimonial(index)}
                 className={`h-3 rounded-full transition-all duration-300 ${
-                  index === currentTestimonial 
-                    ? 'bg-tech-gradient w-8' 
-                    : 'bg-gray-400 hover:bg-gray-500 w-3'
+                  index === currentTestimonial
+                    ? "bg-tech-gradient w-8"
+                    : "bg-gray-400 hover:bg-gray-500 w-3"
                 }`}
               />
             ))}
@@ -202,16 +218,23 @@ export default function TestimonialsSection() {
           <p className="text-gray-500 text-sm mb-8">
             Empresas que confiam na AllTech Digital
           </p>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center opacity-60">
             {[
-              "TechCorp", "Innovate", "DataFlow", "SmartBiz", "CloudFirst", "NextGen"
+              "TechCorp",
+              "Innovate",
+              "DataFlow",
+              "SmartBiz",
+              "CloudFirst",
+              "NextGen",
             ].map((company, index) => (
-              <div 
+              <div
                 key={index}
                 className="bg-gray-50 rounded-lg p-4 h-16 flex items-center justify-center border border-gray-300"
               >
-                <span className="text-gray-500 font-semibold text-sm">{company}</span>
+                <span className="text-gray-500 font-semibold text-sm">
+                  {company}
+                </span>
               </div>
             ))}
           </div>
@@ -223,8 +246,8 @@ export default function TestimonialsSection() {
             Quer ser nosso próximo case de sucesso?
           </h3>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-            Solicite um diagnóstico gratuito e descubra como podemos 
-            transformar sua empresa com tecnologia
+            Solicite um diagnóstico gratuito e descubra como podemos transformar
+            sua empresa com tecnologia
           </p>
           <button className="btn-primary text-lg px-8 py-4 animate-gradient">
             Começar Minha Transformação Digital
@@ -232,5 +255,5 @@ export default function TestimonialsSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

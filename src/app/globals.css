@@ -13,7 +13,7 @@ html {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   line-height: 1.6;
   color: #1e293b;
   background-color: #f8fafc;
@@ -23,35 +23,35 @@ body {
   .btn-primary {
     @apply bg-tech-gradient text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105;
   }
-  
+
   .btn-secondary {
     @apply bg-gray-100 border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300;
   }
-  
+
   .section-padding {
     @apply py-16 lg:py-24;
   }
-  
+
   .container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
-  
+
   .hero-slide {
     @apply relative h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat;
   }
-  
+
   .hero-overlay {
     @apply absolute inset-0 bg-black bg-opacity-50;
   }
-  
+
   .hero-content {
     @apply relative z-10 text-center text-white max-w-4xl px-4;
   }
-  
+
   .card-hover {
     @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-2;
   }
-  
+
   .text-gradient {
     @apply bg-tech-text bg-clip-text text-transparent;
   }
@@ -62,8 +62,13 @@ body {
 }
 
 @keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .animate-gradient {

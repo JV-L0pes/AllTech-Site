@@ -1,10 +1,10 @@
-import Header from '@/components/Header'
-import HeroSection from '@/components/HeroSection'
-import ValueProposition from '@/components/ValueProposition'
-import ServicesGrid from '@/components/ServicesGrid'
-import TestimonialsSection from '@/components/TestimonialsSection'
-import ContactForm from '@/components/ContactForm'
-import Footer from '@/components/Footer'
+import Header from "@/components/Header";
+import HeroSection from "@/components/HeroSection";
+import ValueProposition from "@/components/ValueProposition";
+import ServicesGrid from "@/components/ServicesGrid";
+import TestimonialsSection from "@/components/TestimonialsSection";
+import ContactForm from "@/components/ContactForm";
+import Footer from "@/components/Footer";
 
 export default function HomePage() {
   return (
@@ -17,5 +17,5 @@ export default function HomePage() {
       <ContactForm />
       <Footer />
     </main>
-  )
+  );
 }
