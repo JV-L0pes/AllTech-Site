@@ -128,17 +128,13 @@ O projeto também pode ser deployado em:
 3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
+   
 ## 📞 Contato
 
 **AllTech Digital**
-- Email: contato@alltechdigital.com
-- Website: [alltechdigital.com](https://alltechdigital.com)
-- LinkedIn: [AllTech Digital](https://linkedin.com/company/alltech-digital)
+- Email: joao.rosa@alltechbr.solutions
+- Website: [alltechdigital.com](#)
+- LinkedIn: [AllTech Digital](https://www.linkedin.com/company/alltechdigital/posts/?feedView=all)
 
 ---
 
