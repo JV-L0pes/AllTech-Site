@@ -8,7 +8,7 @@ export default function HeroSection() {
   const slides = [
     {
       id: 1,
-      title: "Cansado de investir em tecnologia sem ver resultados?",
+      title: "Quer investir em tecnologia de forma inteligente?",
       subtitle: "Transforme sua empresa com soluções Microsoft que realmente funcionam",
       description: "Implementação de software, treinamentos especializados e migração para cloud com resultados garantidos.",
       backgroundClass: "bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800"
