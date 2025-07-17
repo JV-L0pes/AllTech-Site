@@ -1,9 +1,57 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 
-export default function ContactForm() {
-  const [formData, setFormData] = useState({
+interface FormData {
+  name: string
+  email: string
+  company: string
+  phone: string
+  service: string
+  message: string
+}
+
+interface FormErrors {
+  [key: string]: string
+}
+
+// Validações mais robustas
+const validateForm = (data: FormData): FormErrors => {
+  const errors: FormErrors = {}
+  
+  // Nome
+  if (!data.name.trim()) {
+    errors.name = 'Nome é obrigatório'
+  } else if (data.name.length < 2) {
+    errors.name = 'Nome deve ter pelo menos 2 caracteres'
+  }
+  
+  // Email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!data.email.trim()) {
+    errors.email = 'Email é obrigatório'
+  } else if (!emailRegex.test(data.email)) {
+    errors.email = 'Email inválido'
+  }
+  
+  // Telefone (opcional, mas se preenchido deve estar correto)
+  if (data.phone && !/^\(\d{2}\)\s\d{4,5}-\d{4}$/.test(data.phone)) {
+    errors.phone = 'Formato: (11) 99999-9999'
+  }
+  
+  // Mensagem
+  if (!data.message.trim()) {
+    errors.message = 'Mensagem é obrigatória'
+  } else if (data.message.length < 10) {
+    errors.message = 'Mensagem deve ter pelo menos 10 caracteres'
+  }
+  
+  return errors
+}
+
+// Hook personalizado para gerenciar o formulário
+const useContactForm = () => {
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     company: '',
@@ -11,46 +59,88 @@ export default function ContactForm() {
     service: '',
     message: ''
   })
-
+  
+  const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+
+  const handleChange = useCallback((field: keyof FormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+    
+    // Limpar erro quando usuário começar a digitar
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }))
+    }
+  }, [errors])
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // Validar formulário
+    const validationErrors = validateForm(formData)
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      return
+    }
+
+    setIsSubmitting(true)
+    setSubmitStatus('idle')
+
+    try {
+      // Simular envio (aqui você integraria com sua API)
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Resetar formulário em caso de sucesso
+      setFormData({
+        name: '',
+        email: '',
+        company: '',
+        phone: '',
+        service: '',
+        message: ''
+      })
+      setErrors({})
+      setSubmitStatus('success')
+      
+    } catch (error) {
+      setSubmitStatus('error')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }, [formData])
+
+  return {
+    formData,
+    errors,
+    isSubmitting,
+    submitStatus,
+    handleChange,
+    handleSubmit
+  }
+}
+
+export default function ContactForm() {
+  const {
+    formData,
+    errors,
+    isSubmitting,
+    submitStatus,
+    handleChange,
+    handleSubmit
+  } = useContactForm()
 
   const services = [
     'Implementação de Software',
-    'Treinamentos Microsoft', 
+    'Treinamentos Microsoft',
     'Cloud Service',
     'Inteligência Artificial',
     'Diagnóstico Gratuito'
   ]
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    
-    // Simular envio do formulário
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    console.log('Dados do formulário:', formData)
-    alert('Formulário enviado com sucesso! Entraremos em contato em breve.')
-    
-    // Reset form
-    setFormData({
-      name: '',
-      email: '',
-      company: '',
-      phone: '',
-      service: '',
-      message: ''
-    })
-    
-    setIsSubmitting(false)
+  const getInputClassName = (fieldName: string) => {
+    const baseClasses = "w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+    const errorClasses = errors[fieldName] ? "border-red-500" : "border-gray-300"
+    return `${baseClasses} ${errorClasses}`
   }
 
   return (
@@ -76,7 +166,12 @@ export default function ContactForm() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900">Email</h4>
-                  <p className="text-gray-600">contato@alltechdigital.com</p>
+                  <a 
+                    href="mailto:contato@alltechdigital.com" 
+                    className="text-gray-600 hover:text-blue-500 transition-colors"
+                  >
+                    contato@alltechdigital.com
+                  </a>
                 </div>
               </div>
 
@@ -86,7 +181,12 @@ export default function ContactForm() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900">Telefone</h4>
-                  <p className="text-gray-600">(11) 9 9999-9999</p>
+                  <a 
+                    href="tel:+5511999999999" 
+                    className="text-gray-600 hover:text-blue-500 transition-colors"
+                  >
+                    (11) 9 9999-9999
+                  </a>
                 </div>
               </div>
 
@@ -97,16 +197,6 @@ export default function ContactForm() {
                 <div>
                   <h4 className="font-semibold text-gray-900">Localização</h4>
                   <p className="text-gray-600">São Paulo, SP - Brasil</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-tech-gradient rounded-lg flex items-center justify-center">
-                  <span className="text-white text-xl">⏰</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Horário</h4>
-                  <p className="text-gray-600">Segunda à Sexta: 9h às 18h</p>
                 </div>
               </div>
             </div>
@@ -139,6 +229,32 @@ export default function ContactForm() {
 
           {/* Formulário */}
           <div className="bg-gray-50 rounded-2xl p-8 border border-gray-300 shadow-lg">
+            {/* Mensagem de sucesso */}
+            {submitStatus === 'success' && (
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center">
+                  <span className="text-green-500 text-xl mr-3">✓</span>
+                  <div>
+                    <h4 className="font-semibold text-green-800">Mensagem enviada com sucesso!</h4>
+                    <p className="text-green-700 text-sm">Entraremos em contato em breve.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Mensagem de erro */}
+            {submitStatus === 'error' && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center">
+                  <span className="text-red-500 text-xl mr-3">✗</span>
+                  <div>
+                    <h4 className="font-semibold text-red-800">Erro ao enviar mensagem</h4>
+                    <p className="text-red-700 text-sm">Tente novamente ou use nosso email diretamente.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
@@ -148,13 +264,17 @@ export default function ContactForm() {
                   <input
                     type="text"
                     id="name"
-                    name="name"
                     value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                    onChange={(e) => handleChange('name', e.target.value)}
+                    className={getInputClassName('name')}
                     placeholder="Seu nome completo"
+                    aria-describedby={errors.name ? "name-error" : undefined}
                   />
+                  {errors.name && (
+                    <p id="name-error" className="text-red-500 text-xs mt-1" role="alert">
+                      {errors.name}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -164,13 +284,17 @@ export default function ContactForm() {
                   <input
                     type="email"
                     id="email"
-                    name="email"
                     value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                    onChange={(e) => handleChange('email', e.target.value)}
+                    className={getInputClassName('email')}
                     placeholder="seu@email.com"
+                    aria-describedby={errors.email ? "email-error" : undefined}
                   />
+                  {errors.email && (
+                    <p id="email-error" className="text-red-500 text-xs mt-1" role="alert">
+                      {errors.email}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -182,10 +306,9 @@ export default function ContactForm() {
                   <input
                     type="text"
                     id="company"
-                    name="company"
                     value={formData.company}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                    onChange={(e) => handleChange('company', e.target.value)}
+                    className={getInputClassName('company')}
                     placeholder="Nome da sua empresa"
                   />
                 </div>
@@ -197,12 +320,17 @@ export default function ContactForm() {
                   <input
                     type="tel"
                     id="phone"
-                    name="phone"
                     value={formData.phone}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                    onChange={(e) => handleChange('phone', e.target.value)}
+                    className={getInputClassName('phone')}
                     placeholder="(11) 9 9999-9999"
+                    aria-describedby={errors.phone ? "phone-error" : undefined}
                   />
+                  {errors.phone && (
+                    <p id="phone-error" className="text-red-500 text-xs mt-1" role="alert">
+                      {errors.phone}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -212,10 +340,9 @@ export default function ContactForm() {
                 </label>
                 <select
                   id="service"
-                  name="service"
                   value={formData.service}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                  onChange={(e) => handleChange('service', e.target.value)}
+                  className={getInputClassName('service')}
                 >
                   <option value="">Selecione um serviço</option>
                   {services.map((service, index) => (
@@ -232,14 +359,18 @@ export default function ContactForm() {
                 </label>
                 <textarea
                   id="message"
-                  name="message"
                   value={formData.message}
-                  onChange={handleChange}
-                  required
+                  onChange={(e) => handleChange('message', e.target.value)}
                   rows={5}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white resize-vertical"
+                  className={getInputClassName('message')}
                   placeholder="Conte-nos sobre seu projeto ou necessidade..."
+                  aria-describedby={errors.message ? "message-error" : undefined}
                 />
+                {errors.message && (
+                  <p id="message-error" className="text-red-500 text-xs mt-1" role="alert">
+                    {errors.message}
+                  </p>
+                )}
               </div>
 
               <button
@@ -250,6 +381,7 @@ export default function ContactForm() {
                     ? 'opacity-70 cursor-not-allowed' 
                     : 'animate-gradient hover:scale-105'
                 }`}
+                aria-describedby="submit-status"
               >
                 {isSubmitting ? (
                   <span className="flex items-center justify-center gap-2">
