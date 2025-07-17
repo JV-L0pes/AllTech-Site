@@ -1,19 +1,53 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showHeader, setShowHeader] = useState(true)
+  const [lastScrollY, setLastScrollY] = useState(0)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      const threshold = 200
+      if (currentScrollY <= threshold) {
+        setShowHeader(true)
+      } else if (currentScrollY > lastScrollY) {
+        setShowHeader(false)
+      } else {
+        setShowHeader(true)
+      }
+      setLastScrollY(currentScrollY)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [lastScrollY])
 
   return (
-    <header className="bg-gray-100/95 backdrop-blur-sm shadow-lg fixed w-full top-0 z-50 border-b border-gray-300">
+    <header className={`bg-gray-100/95 backdrop-blur-sm shadow-lg fixed w-full top-0 z-50 border-b border-gray-300 transition-transform duration-300 ${showHeader ? 'translate-y-0' : '-translate-y-full'}`}>
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center py-4">
+        <div className="flex justify-between items-center py-3">
           {/* Logo */}
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-gradient">
-              AllTech Digital
-            </h1>
+            <div className="flex items-center gap-3">
+              {/* Logo da empresa */}
+              <Image 
+                src="/images/Alltech-logo.png" 
+                alt="AllTech Digital"
+                width={52}
+                height={52}
+                className="drop-shadow-sm hover:scale-105 transition-transform duration-200"
+                priority
+              />
+              {/* Texto da marca - seguindo o design original */}
+              <div className="flex items-center">
+                <span className="text-2xl font-bold text-gray-900 tracking-tight">All</span>
+                <span className="text-2xl font-bold text-gray-900 tracking-tight">Tech</span>
+                <span className="text-lg font-light text-gray-600 ml-2">Digital</span>
+              </div>
+            </div>
           </div>
 
           {/* Desktop Menu */}

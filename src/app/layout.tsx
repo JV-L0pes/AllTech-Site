@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 
@@ -25,7 +25,11 @@ export const metadata: Metadata = {
     title: 'AllTech Digital - Inovação que respeita e conecta',
     description: 'Soluções completas e personalizadas em tecnologia para empresas que desejam investir de forma inteligente.',
   },
-  viewport: 'width=device-width, initial-scale=1',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
   themeColor: '#3B82F6',
 }
 
@@ -42,6 +46,13 @@ export default function RootLayout({
         <meta name="format-detection" content="telephone=no" />
         <meta name="msapplication-TileColor" content="#3B82F6" />
         <meta name="theme-color" content="#3B82F6" />
+        {/* Favicon personalizado usando o logo */}
+        <link rel="icon" type="image/png" sizes="16x16" href="/images/Alltech-logo.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/Alltech-logo.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/images/Alltech-logo.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/images/Alltech-logo.png" />
+        <link rel="apple-touch-icon" href="/images/Alltech-logo.png" />
+        <link rel="shortcut icon" href="/images/Alltech-logo.png" />
       </head>
       <body className={`${inter.className} antialiased`}>
         {children}

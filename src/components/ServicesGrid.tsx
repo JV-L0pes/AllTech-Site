@@ -141,7 +141,7 @@ export default function ServicesGrid() {
               Não sabe por onde começar?
             </h3>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Oferecemos um <span className="text-gradient font-semibold">diagnóstico gratuito</span> 
+              Oferecemos um <span className="text-gradient font-semibold">diagnóstico gratuito </span> 
               da sua infraestrutura tecnológica atual, identificando oportunidades 
               de melhoria e criando um roadmap personalizado para sua empresa.
             </p>
