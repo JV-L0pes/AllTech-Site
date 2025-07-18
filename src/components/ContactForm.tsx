@@ -217,6 +217,7 @@ interface InputFieldProps {
   required?: boolean;
   icon?: React.ReactNode;
   maxLength?: number;
+  labelClassName?: string;
 }
 
 function InputField({
@@ -229,17 +230,21 @@ function InputField({
   placeholder,
   required = false,
   icon,
-  maxLength
-}: InputFieldProps) {
-  const inputClassName = `
-    w-full px-4 py-3 pl-${icon ? '12' : '4'} border rounded-lg transition-all bg-white
-    focus:ring-2 focus:ring-tech-cyan focus:border-transparent
-    ${error ? 'border-red-500' : 'border-gray-300 hover:border-tech-cyan/50'}
-  `;
+  maxLength,
+  labelClassName = "",
+  inputClassName = ""
+}: InputFieldProps & { labelClassName?: string; inputClassName?: string }) {
+  const inputClass = [
+    "w-full px-4 py-3 border rounded-lg transition-all bg-white",
+    "focus:ring-2 focus:ring-tech-cyan focus:border-transparent",
+    error ? "border-red-500" : "border-gray-300 hover:border-tech-cyan/50",
+    icon ? "pl-12" : "pl-4",
+    inputClassName
+  ].join(" ");
 
   return (
     <div className="relative">
-      <label htmlFor={id} className="block text-sm font-semibold text-gray-700 mb-2">
+      <label htmlFor={id} className={`block text-sm font-semibold text-gray-700 mb-2 ${labelClassName}`}>
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       <div className="relative">
@@ -253,7 +258,7 @@ function InputField({
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className={inputClassName}
+            className={inputClass}
             placeholder={placeholder}
             rows={5}
             maxLength={maxLength}
@@ -264,7 +269,7 @@ function InputField({
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className={inputClassName}
+            className={inputClass}
             aria-describedby={error ? `${id}-error` : undefined}
           >
             <option value="">Selecione um serviço</option>
@@ -281,7 +286,7 @@ function InputField({
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className={inputClassName}
+            className={inputClass}
             placeholder={placeholder}
             maxLength={maxLength}
             aria-describedby={error ? `${id}-error` : undefined}
@@ -570,7 +575,7 @@ export default function ContactForm() {
 
                 <div className="grid md:grid-cols-3 gap-6 mt-6">
                   <div>
-                    <label htmlFor="numberOfEmployees" className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="numberOfEmployees" className="block text-sm font-semibold text-gray-700 mb-2 min-h-[40px]">
                       Número de Funcionários
                     </label>
                     <select
@@ -589,14 +594,14 @@ export default function ContactForm() {
                   </div>
 
                   <div>
-                    <label htmlFor="state" className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="state" className="block text-sm font-semibold text-gray-700 mb-2 min-h-[40px]">
                       Estado
                     </label>
                     <select
                       id="state"
                       value={formData.state}
                       onChange={(e) => updateField("state", e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg transition-all bg-white focus:ring-2 focus:ring-tech-cyan focus:border-transparent hover:border-tech-cyan/50"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg transition-all bg-white focus:ring-2 focus:ring-tech-cyan focus:border-transparent hover:border-tech-cyan/50 pt-3"
                     >
                       <option value="">Selecione</option>
                       {estadosBrasileiros.map((estado) => (
@@ -614,6 +619,8 @@ export default function ContactForm() {
                     onChange={(value) => updateField("city", value)}
                     placeholder="Sua cidade"
                     maxLength={50}
+                    labelClassName="min-h-[40px]"
+                    inputClassName="pt-2"
                   />
                 </div>
               </div>
