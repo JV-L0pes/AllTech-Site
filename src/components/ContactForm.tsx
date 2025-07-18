@@ -594,7 +594,7 @@ export default function ContactForm() {
                   </div>
 
                   <div>
-                    <label htmlFor="state" className="block text-sm font-semibold text-gray-700 mb-2 min-h-[40px]">
+                    <label htmlFor="state" className="block text-sm font-semibold text-gray-700 mb-2 min-h-[40px] pt-2">
                       Estado
                     </label>
                     <select
@@ -619,7 +619,7 @@ export default function ContactForm() {
                     onChange={(value) => updateField("city", value)}
                     placeholder="Sua cidade"
                     maxLength={50}
-                    labelClassName="min-h-[40px]"
+                    labelClassName="min-h-[40px] mb-2 pt-2"
                     inputClassName="pt-2"
                   />
                 </div>
