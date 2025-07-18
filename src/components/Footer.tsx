@@ -25,10 +25,10 @@ export default function Footer() {
   };
 
   const socialLinks = [
-    { name: "LinkedIn", Icon: Linkedin, href: "#", color: "hover:text-blue-400" },
-    { name: "YouTube", Icon: Youtube, href: "#", color: "hover:text-red-400" },
-    { name: "Instagram", Icon: Instagram, href: "https://www.instagram.com/alltech.digital/", color: "hover:text-pink-400" },
-    { name: "WhatsApp", Icon: MessageCircle, href: "#", color: "hover:text-green-400" },
+    { name: "LinkedIn", Icon: Linkedin, href: "#", hoverColor: "hover:bg-blue-600", iconColor: "group-hover:text-white" },
+    { name: "YouTube", Icon: Youtube, href: "#", hoverColor: "hover:bg-red-600", iconColor: "group-hover:text-white" },
+    { name: "Instagram", Icon: Instagram, href: "https://www.instagram.com/alltech.digital/", hoverColor: "hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500", iconColor: "group-hover:text-white" },
+    { name: "WhatsApp", Icon: MessageCircle, href: "#", hoverColor: "hover:bg-green-500", iconColor: "group-hover:text-white" },
   ];
 
   return (
@@ -36,48 +36,59 @@ export default function Footer() {
       {/* Seção principal do footer */}
       <div className="container mx-auto px-4 py-16">
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-8">
-          {/* Informações da empresa */}
+          {/* Informações da empresa - com título e ícones melhorados */}
           <div className="lg:col-span-1">
-            <h3 className="text-2xl font-bold text-gradient mb-6">
-              AllTech Digital
-            </h3>
-            <p className="text-gray-400 mb-6 leading-relaxed">
+            {/* Título com ícone para a descrição */}
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-xl">🚀</span>
+              </div>
+              <h3 className="text-xl font-bold text-white">Nossa Missão</h3>
+            </div>
+            
+            <p className="text-gray-300 mb-8 leading-relaxed text-base">
               Transformamos empresas através de soluções tecnológicas
               inteligentes, personalizadas e focadas em resultados mensuráveis.
             </p>
 
-            {/* Certificações */}
-            <div className="mb-6">
-              <div className="inline-block bg-tech-gradient px-4 py-2 rounded-lg hover:scale-105 transition-transform duration-300">
-                <span className="text-white font-semibold text-sm">
+            {/* Certificação Microsoft - mais destaque */}
+            <div className="mb-8">
+              <div className="inline-block bg-blue-600 px-6 py-3 rounded-lg hover:scale-105 transition-transform duration-300 shadow-lg">
+                <span className="text-white font-bold text-base">
                   🏆 Microsoft Gold Partner
                 </span>
               </div>
             </div>
 
-            {/* Informações de contato */}
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center gap-3 hover:text-white transition-colors group">
-                <Mail className="w-4 h-4 text-tech-cyan group-hover:scale-110 transition-transform duration-300" />
+            {/* Informações de contato - ícones mais vibrantes */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 hover:text-white transition-colors group">
+                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors duration-300">
+                  <Mail className="w-5 h-5 text-white" />
+                </div>
                 <a
                   href="mailto:contato@alltechdigital.com"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-white transition-colors font-medium text-gray-300"
                 >
                   contato@alltechdigital.com
                 </a>
               </div>
-              <div className="flex items-center gap-3 hover:text-white transition-colors group">
-                <Phone className="w-4 h-4 text-tech-cyan group-hover:scale-110 transition-transform duration-300" />
+              <div className="flex items-center gap-4 hover:text-white transition-colors group">
+                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors duration-300">
+                  <Phone className="w-5 h-5 text-white" />
+                </div>
                 <a
                   href="tel:+5511999999999"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-white transition-colors font-medium text-gray-300"
                 >
                   (11) 9 9999-9999
                 </a>
               </div>
-              <div className="flex items-center gap-3 hover:text-white transition-colors group">
-                <MapPin className="w-4 h-4 text-tech-cyan group-hover:scale-110 transition-transform duration-300" />
-                <span>São Paulo, SP - Brasil</span>
+              <div className="flex items-center gap-4 hover:text-white transition-colors group">
+                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors duration-300">
+                  <MapPin className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-medium text-gray-300">São Paulo, SP - Brasil</span>
               </div>
             </div>
           </div>
@@ -93,7 +104,7 @@ export default function Footer() {
                     className="text-gray-400 hover:text-white hover-text-gradient transition-all duration-300 text-sm relative group"
                   >
                     {link.name}
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-tech-gradient transition-all duration-300 group-hover:w-full"></span>
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                   </a>
                 </li>
               ))}
@@ -111,7 +122,7 @@ export default function Footer() {
                     className="text-gray-400 hover:text-white hover-text-gradient transition-all duration-300 text-sm relative group"
                   >
                     {link.name}
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-tech-gradient transition-all duration-300 group-hover:w-full"></span>
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                   </a>
                 </li>
               ))}
@@ -129,7 +140,7 @@ export default function Footer() {
                     className="text-gray-400 hover:text-white hover-text-gradient transition-all duration-300 text-sm relative group"
                   >
                     {link.name}
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-tech-gradient transition-all duration-300 group-hover:w-full"></span>
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                   </a>
                 </li>
               ))}
@@ -145,9 +156,9 @@ export default function Footer() {
                 <input
                   type="email"
                   placeholder="Seu email"
-                  className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm text-white placeholder-gray-400 focus:outline-none focus:border-tech-cyan focus:ring-1 focus:ring-tech-cyan transition-all duration-300"
+                  className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-300"
                 />
-                <button className="bg-tech-gradient px-4 py-2 rounded text-white text-sm font-semibold hover:opacity-90 hover:scale-105 transition-all duration-300">
+                <button className="bg-blue-600 px-4 py-2 rounded text-white text-sm font-semibold hover:bg-blue-700 hover:scale-105 transition-all duration-300">
                   OK
                 </button>
               </div>
@@ -169,14 +180,14 @@ export default function Footer() {
                 Solicite um diagnóstico gratuito e descubra o potencial da sua
                 infraestrutura
               </p>
-              <button className="btn-primary animate-gradient hover:scale-105 transition-all duration-300">
+              <button className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 hover:scale-105 transition-all duration-300">
                 Solicitar Diagnóstico Gratuito
               </button>
             </div>
 
             {/* Redes sociais */}
             <div className="text-center md:text-right">
-              <h5 className="text-white font-semibold mb-4">
+              <h5 className="text-white font-semibold mb-6">
                 Nos siga nas redes sociais
               </h5>
               <div className="flex justify-center md:justify-end gap-4">
@@ -186,14 +197,19 @@ export default function Footer() {
                     <a
                       key={index}
                       href={social.href}
-                      className="w-10 h-10 bg-gray-700 hover:bg-tech-gradient rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 group"
+                      className={`w-12 h-12 bg-gray-700/50 backdrop-blur-sm ${social.hoverColor} rounded-2xl flex items-center justify-center transition-all duration-500 hover:scale-110 hover:rotate-3 group shadow-lg hover:shadow-xl`}
                       title={social.name}
                     >
-                      <IconComponent className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors duration-300" />
+                      <IconComponent className={`w-6 h-6 text-gray-300 ${social.iconColor} transition-all duration-300 group-hover:scale-110`} />
                     </a>
                   );
                 })}
               </div>
+              
+              {/* Texto adicional mais sutil */}
+              <p className="text-gray-500 text-xs mt-4 font-medium">
+                Acompanhe nossas novidades e dicas de tecnologia
+              </p>
             </div>
           </div>
         </div>
@@ -213,21 +229,21 @@ export default function Footer() {
                 className="hover:text-white hover-text-gradient transition-all duration-300 relative group"
               >
                 Política de Privacidade
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-tech-gradient transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </a>
               <a 
                 href="#" 
                 className="hover:text-white hover-text-gradient transition-all duration-300 relative group"
               >
                 Termos de Uso
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-tech-gradient transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </a>
               <a 
                 href="#" 
                 className="hover:text-white hover-text-gradient transition-all duration-300 relative group"
               >
                 Cookies
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-tech-gradient transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </a>
             </div>
 

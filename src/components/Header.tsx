@@ -24,7 +24,7 @@ export default function Header() {
         : 'bg-white/95 border-gray-200 shadow-lg'
     }`}>
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center py-3">
+        <div className="flex justify-between items-center py-2">
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex items-center gap-3">
@@ -32,21 +32,18 @@ export default function Header() {
               <Image
                 src="/images/Alltech-logo.png"
                 alt="AllTech Digital"
-                width={52}
-                height={52}
+                width={80}
+                height={80}
                 className="logo-no-background drop-shadow-sm hover:scale-105 transition-transform duration-200"
                 priority
               />
 
-              {/* Texto da marca - seguindo o design original com novo tema */}
-              <div className="flex items-center">
+              {/* Texto da marca - alinhado lado a lado com tamanhos iguais */}
+              <div className="flex items-center gap-1">
                 <span className="text-2xl font-bold text-gray-900 tracking-tight hover-text-gradient transition-all duration-300">
-                  All
+                  AllTech
                 </span>
-                <span className="text-2xl font-bold text-gray-900 tracking-tight hover-text-gradient transition-all duration-300">
-                  Tech
-                </span>
-                <span className="text-lg font-light text-tech-deep ml-2 hover-text-gradient transition-all duration-300">
+                <span className="text-2xl font-bold text-tech-deep tracking-tight hover-text-gradient transition-all duration-300">
                   Digital
                 </span>
               </div>
@@ -90,7 +87,7 @@ export default function Header() {
             <a
               href="https://www.instagram.com/alltech.digital/"
               title="Instagram"
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group hover:scale-110 tech-pulse"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group hover:scale-110"
               target="_blank" rel="noopener noreferrer"
             >
               <Instagram className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
@@ -98,7 +95,7 @@ export default function Header() {
             <a
               href="#"
               title="LinkedIn"
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group hover:scale-110 tech-pulse"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group hover:scale-110"
             >
               <Linkedin className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
             </a>
@@ -152,7 +149,7 @@ export default function Header() {
                 <a
                   href="https://www.instagram.com/alltech.digital/"
                   title="Instagram"
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group tech-pulse"
+                  className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group"
                   target="_blank" rel="noopener noreferrer"
                 >
                   <Instagram className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
@@ -160,7 +157,7 @@ export default function Header() {
                 <a
                   href="#"
                   title="LinkedIn"
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group tech-pulse"
+                  className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group"
                 >
                   <Linkedin className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
                 </a>
