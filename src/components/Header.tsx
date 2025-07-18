@@ -6,8 +6,23 @@ import { Instagram, Linkedin } from "lucide-react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <header className="bg-gray-100/95 backdrop-blur-sm shadow-lg fixed w-full top-0 z-50 border-b border-gray-300 transition-transform duration-300 translate-y-0">
+    <header className={`backdrop-blur-sm fixed w-full top-0 z-50 border-b transition-all duration-300 ${
+      isScrolled 
+        ? 'bg-gray-100/95 border-gray-300 shadow-xl' 
+        : 'bg-gray-100/95 border-gray-300 shadow-lg'
+    }`}>
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-3">
           {/* Logo */}
@@ -41,54 +56,59 @@ export default function Header() {
           <nav className="hidden md:flex space-x-8">
             <a
               href="#inicio"
-              className="text-gray-700 hover:text-transparent hover:bg-tech-text hover:bg-clip-text transition-all duration-300 font-medium"
+              className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium relative group"
             >
               Início
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-tech-gradient transition-all duration-300 group-hover:w-full"></span>
             </a>
             <a
               href="#servicos"
-              className="text-gray-700 hover:text-transparent hover:bg-tech-text hover:bg-clip-text transition-all duration-300 font-medium"
+              className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium relative group"
             >
               Serviços
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-tech-gradient transition-all duration-300 group-hover:w-full"></span>
             </a>
             <a
               href="#depoimentos"
-              className="text-gray-700 hover:text-transparent hover:bg-tech-text hover:bg-clip-text transition-all duration-300 font-medium"
+              className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium relative group"
             >
               Depoimentos
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-tech-gradient transition-all duration-300 group-hover:w-full"></span>
             </a>
             <a
               href="#contato"
-              className="text-gray-700 hover:text-transparent hover:bg-tech-text hover:bg-clip-text transition-all duration-300 font-medium"
+              className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium relative group"
             >
               Contato
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-tech-gradient transition-all duration-300 group-hover:w-full"></span>
             </a>
           </nav>
 
           {/* Contatos - Ícones sociais + CTA Button (agrupados) */}
           <div className="hidden md:flex items-center gap-2 ml-2">
             <a
-              href="#"
+              href="https://www.instagram.com/alltech.digital/"
               title="Instagram"
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 hover:bg-tech-gradient transition-all duration-300 group"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 hover:bg-tech-gradient transition-all duration-300 group hover:scale-110"
+              target="_blank" rel="noopener noreferrer"
             >
               <Instagram className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
             </a>
             <a
               href="#"
               title="LinkedIn"
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 hover:bg-tech-gradient transition-all duration-300 group"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 hover:bg-tech-gradient transition-all duration-300 group hover:scale-110"
             >
               <Linkedin className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
             </a>
-            <button className="btn-primary animate-gradient ml-2">
+            <button className="btn-primary animate-gradient ml-2 hover:scale-105 transition-transform duration-300">
               Diagnóstico Gratuito
             </button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 text-2xl text-gray-700 hover:text-blue-500 transition-colors"
+            className="md:hidden p-2 text-2xl text-gray-700 hover:text-tech-gradient transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? "✕" : "☰"}
@@ -97,37 +117,42 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden pb-4 border-t border-gray-300 mt-4 pt-4 bg-gray-100">
+          <div className="md:hidden pb-4 border-t border-gray-300 mt-4 pt-4 bg-gray-100 rounded-b-lg">
             <nav className="flex flex-col space-y-4">
               <a
                 href="#inicio"
-                className="text-gray-700 hover:text-blue-500 transition-colors font-medium"
+                className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium py-2 px-4 rounded-md hover:bg-gray-200"
+                onClick={() => setIsMenuOpen(false)}
               >
                 Início
               </a>
               <a
                 href="#servicos"
-                className="text-gray-700 hover:text-blue-500 transition-colors font-medium"
+                className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium py-2 px-4 rounded-md hover:bg-gray-200"
+                onClick={() => setIsMenuOpen(false)}
               >
                 Serviços
               </a>
               <a
                 href="#depoimentos"
-                className="text-gray-700 hover:text-blue-500 transition-colors font-medium"
+                className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium py-2 px-4 rounded-md hover:bg-gray-200"
+                onClick={() => setIsMenuOpen(false)}
               >
                 Depoimentos
               </a>
               <a
                 href="#contato"
-                className="text-gray-700 hover:text-blue-500 transition-colors font-medium"
+                className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium py-2 px-4 rounded-md hover:bg-gray-200"
+                onClick={() => setIsMenuOpen(false)}
               >
                 Contato
               </a>
-              <div className="flex gap-3 mt-2 mb-2">
+              <div className="flex gap-3 mt-2 mb-2 px-4">
                 <a
-                  href="#"
+                  href="https://www.instagram.com/alltech.digital/"
                   title="Instagram"
                   className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 hover:bg-tech-gradient transition-all duration-300 group"
+                  target="_blank" rel="noopener noreferrer"
                 >
                   <Instagram className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
                 </a>

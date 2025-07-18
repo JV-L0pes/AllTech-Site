@@ -101,12 +101,12 @@ export default function TestimonialsSection() {
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="text-center bg-gray-50 rounded-xl p-6 border border-gray-300 shadow-sm"
+              className="text-center bg-gray-50 rounded-xl p-6 tech-border-hover tech-shadow group hover:scale-105 transition-all duration-300"
             >
-              <div className="text-4xl lg:text-5xl font-bold text-gradient mb-2">
+              <div className="text-4xl lg:text-5xl font-bold text-gradient mb-2 group-hover:scale-110 transition-transform duration-300">
                 {stat.number}
               </div>
-              <div className="text-xl font-semibold text-gray-900 mb-2">
+              <div className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-tech-cyan transition-all duration-300">
                 {stat.label}
               </div>
               <div className="text-gray-500 text-sm">{stat.description}</div>
@@ -116,25 +116,29 @@ export default function TestimonialsSection() {
 
         {/* Carrossel de depoimentos */}
         <div className="relative max-w-4xl mx-auto">
-          <div className="bg-gray-50 rounded-2xl p-8 lg:p-12 border border-gray-300 shadow-lg">
+          <div className="bg-gray-50 rounded-2xl p-8 lg:p-12 tech-border-hover tech-shadow overflow-hidden">
             {/* Aspas decorativas */}
-            <div className="text-6xl text-blue-500/30 mb-6">"</div>
+            <div className="text-6xl text-tech-cyan/30 mb-6 animate-pulse">"</div>
 
             {/* Conteúdo do depoimento */}
-            <div className="relative">
+            <div className="relative min-h-[400px]">
               {testimonials.map((testimonial, index) => (
                 <div
                   key={testimonial.id}
-                  className={`transition-opacity duration-500 ${
+                  className={`transition-all duration-700 transform ${
                     index === currentTestimonial
-                      ? "opacity-100"
-                      : "opacity-0 absolute inset-0"
+                      ? "opacity-100 translate-x-0"
+                      : "opacity-0 absolute inset-0 translate-x-full"
                   }`}
                 >
                   {/* Estrelas */}
                   <div className="flex justify-center gap-1 mb-6">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <span key={i} className="text-yellow-400 text-xl">
+                      <span 
+                        key={i} 
+                        className="text-yellow-400 text-xl animate-pulse"
+                        style={{animationDelay: `${i * 100}ms`}}
+                      >
                         ★
                       </span>
                     ))}
@@ -147,14 +151,14 @@ export default function TestimonialsSection() {
 
                   {/* Resultado destacado */}
                   <div className="text-center mb-8">
-                    <div className="inline-block bg-tech-gradient text-white px-6 py-2 rounded-full font-semibold">
+                    <div className="inline-block bg-tech-gradient text-white px-6 py-2 rounded-full font-semibold hover:scale-105 transition-transform duration-300 animate-pulse-tech">
                       {testimonial.result}
                     </div>
                   </div>
 
                   {/* Informações do autor */}
                   <div className="flex items-center justify-center gap-4">
-                    <div className="w-14 h-14 bg-tech-gradient rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    <div className="w-14 h-14 bg-tech-gradient rounded-full flex items-center justify-center text-white font-bold text-lg hover:scale-110 transition-transform duration-300 animate-pulse">
                       {testimonial.avatar}
                     </div>
                     <div className="text-left">
@@ -164,7 +168,7 @@ export default function TestimonialsSection() {
                       <div className="text-gray-600">
                         {testimonial.position}
                       </div>
-                      <div className="text-blue-600 text-sm">
+                      <div className="text-tech-cyan text-sm font-medium">
                         {testimonial.company}
                       </div>
                     </div>
@@ -183,7 +187,7 @@ export default function TestimonialsSection() {
                     testimonials.length
                 )
               }
-              className="w-12 h-12 bg-gray-50 hover:bg-white rounded-full flex items-center justify-center text-gray-600 transition-colors duration-200 border border-gray-300 shadow-sm"
+              className="w-12 h-12 bg-gray-50 hover:bg-tech-gradient rounded-full flex items-center justify-center text-gray-600 hover:text-white transition-all duration-300 tech-border-hover hover:scale-110"
             >
               ‹
             </button>
@@ -191,7 +195,7 @@ export default function TestimonialsSection() {
               onClick={() =>
                 goToTestimonial((currentTestimonial + 1) % testimonials.length)
               }
-              className="w-12 h-12 bg-gray-50 hover:bg-white rounded-full flex items-center justify-center text-gray-600 transition-colors duration-200 border border-gray-300 shadow-sm"
+              className="w-12 h-12 bg-gray-50 hover:bg-tech-gradient rounded-full flex items-center justify-center text-gray-600 hover:text-white transition-all duration-300 tech-border-hover hover:scale-110"
             >
               ›
             </button>
@@ -205,8 +209,8 @@ export default function TestimonialsSection() {
                 onClick={() => goToTestimonial(index)}
                 className={`h-3 rounded-full transition-all duration-300 ${
                   index === currentTestimonial
-                    ? "bg-tech-gradient w-8"
-                    : "bg-gray-400 hover:bg-gray-500 w-3"
+                    ? "bg-tech-gradient w-8 animate-pulse"
+                    : "bg-gray-400 hover:bg-tech-gradient w-3"
                 }`}
               />
             ))}
@@ -215,11 +219,11 @@ export default function TestimonialsSection() {
 
         {/* Logos de clientes (simulados) */}
         <div className="mt-16 text-center">
-          <p className="text-gray-500 text-sm mb-8">
+          <p className="text-gray-700 text-base font-medium mb-8">
             Empresas que confiam na AllTech Digital
           </p>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center opacity-60">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center">
             {[
               "TechCorp",
               "Innovate",
@@ -230,9 +234,9 @@ export default function TestimonialsSection() {
             ].map((company, index) => (
               <div
                 key={index}
-                className="bg-gray-50 rounded-lg p-4 h-16 flex items-center justify-center border border-gray-300"
+                className="bg-white rounded-lg p-4 h-16 flex items-center justify-center tech-border-hover group hover:scale-105 transition-all duration-300 shadow-sm hover:shadow-md"
               >
-                <span className="text-gray-500 font-semibold text-sm">
+                <span className="text-gray-700 font-bold text-base group-hover:text-tech-cyan transition-all duration-300">
                   {company}
                 </span>
               </div>
@@ -249,7 +253,7 @@ export default function TestimonialsSection() {
             Solicite um diagnóstico gratuito e descubra como podemos transformar
             sua empresa com tecnologia
           </p>
-          <button className="btn-primary text-lg px-8 py-4 animate-gradient">
+          <button className="btn-primary text-lg px-8 py-4 animate-gradient hover:scale-105 transition-all duration-300">
             Começar Minha Transformação Digital
           </button>
         </div>

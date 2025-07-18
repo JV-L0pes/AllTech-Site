@@ -20,7 +20,7 @@ export default function ServicesGrid() {
         "Treinamento da equipe",
         "Suporte pós-implementação",
       ],
-      color: "from-cyan-500 to-blue-500",
+      color: "from-tech-cyan to-tech-green",
     },
     {
       id: 2,
@@ -36,7 +36,7 @@ export default function ServicesGrid() {
         "Certificações oficiais Microsoft",
         "Metodologia hands-on",
       ],
-      color: "from-blue-500 to-indigo-500",
+      color: "from-tech-cyan to-tech-green",
     },
     {
       id: 3,
@@ -52,7 +52,7 @@ export default function ServicesGrid() {
         "Monitoramento 24/7",
         "Compliance e segurança",
       ],
-      color: "from-indigo-500 to-purple-500",
+      color: "from-tech-cyan to-tech-green",
     },
     {
       id: 4,
@@ -68,7 +68,7 @@ export default function ServicesGrid() {
         "Machine Learning personalizado",
         "Dashboards inteligentes",
       ],
-      color: "from-purple-500 to-pink-500",
+      color: "from-tech-cyan to-tech-green",
     },
   ];
 
@@ -78,7 +78,7 @@ export default function ServicesGrid() {
         {/* Título da seção */}
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-            Nossos <span className="text-gradient">Serviços</span>
+            Nossos <span className="text-tech-cyan font-bold">Serviços</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Soluções completas em tecnologia para transformar seu negócio e
@@ -91,25 +91,25 @@ export default function ServicesGrid() {
           {services.map((service, index) => (
             <div
               key={service.id}
-              className={`card-hover bg-gray-50 rounded-2xl p-8 border-2 transition-all duration-300 cursor-pointer ${
+              className={`card-hover bg-gray-50 rounded-2xl p-8 border-2 transition-all duration-300 cursor-pointer group ${
                 activeService === index
-                  ? "border-blue-500 shadow-xl shadow-blue-500/10"
-                  : "border-gray-300 hover:border-gray-400"
+                  ? "border-tech-gradient shadow-xl shadow-tech-gradient/20 scale-105"
+                  : "border-gray-300 hover:border-tech-gradient/50"
               }`}
               onClick={() => setActiveService(index)}
             >
               {/* Header do card */}
               <div className="flex items-start gap-4 mb-6">
                 <div
-                  className={`w-16 h-16 bg-gradient-to-r ${service.color} rounded-xl flex items-center justify-center text-2xl flex-shrink-0`}
+                  className={`w-16 h-16 bg-gradient-to-r ${service.color} rounded-xl flex items-center justify-center text-2xl flex-shrink-0 hover:scale-110 transition-transform duration-300`}
                 >
                   {service.icon}
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-tech-cyan transition-all duration-300">
                     {service.title}
                   </h3>
-                  <p className="text-gradient font-semibold">
+                  <p className="text-tech-cyan font-semibold">
                     {service.subtitle}
                   </p>
                 </div>
@@ -125,10 +125,13 @@ export default function ServicesGrid() {
                 {service.features.map((feature, featureIndex) => (
                   <div
                     key={featureIndex}
-                    className="flex items-center text-gray-700"
+                    className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
                   >
                     <div
-                      className={`w-2 h-2 bg-gradient-to-r ${service.color} rounded-full mr-3 flex-shrink-0`}
+                      className={`w-2 h-2 bg-gradient-to-r ${service.color} rounded-full mr-3 flex-shrink-0 animate-pulse`}
+                      style={{
+                        animationDelay: `${featureIndex * 200}ms`
+                      }}
                     ></div>
                     <span className="text-sm">{feature}</span>
                   </div>
@@ -137,21 +140,23 @@ export default function ServicesGrid() {
 
               {/* Botão de ação */}
               <div className="mt-6 pt-6 border-t border-gray-300">
-                <button className="btn-secondary w-full">Saiba Mais</button>
+                <button className="btn-secondary w-full hover:scale-105 transition-all duration-300">
+                  Saiba Mais
+                </button>
               </div>
             </div>
           ))}
         </div>
 
         {/* Seção de destaque */}
-        <div className="bg-gray-50 rounded-2xl p-8 lg:p-12 border border-gray-300">
+        <div className="bg-gray-50 rounded-2xl p-8 lg:p-12 tech-border-hover tech-shadow">
           <div className="text-center">
             <h3 className="text-3xl font-bold text-gray-900 mb-6">
               Não sabe por onde começar?
             </h3>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
               Oferecemos um{" "}
-              <span className="text-gradient font-semibold">
+              <span className="text-tech-cyan font-semibold">
                 diagnóstico gratuito{" "}
               </span>
               da sua infraestrutura tecnológica atual, identificando
@@ -160,7 +165,7 @@ export default function ServicesGrid() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="btn-primary text-lg px-8 py-4 animate-gradient">
+              <button className="btn-primary text-lg px-8 py-4 animate-gradient hover:scale-105 transition-all duration-300">
                 Solicitar Diagnóstico Gratuito
               </button>
               <div className="text-gray-500 text-sm">
@@ -174,7 +179,7 @@ export default function ServicesGrid() {
         {/* Processo de trabalho */}
         <div className="mt-16">
           <h3 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            Como <span className="text-gradient">Trabalhamos</span>
+            Como <span className="text-tech-cyan font-bold">Trabalhamos</span>
           </h3>
 
           <div className="grid md:grid-cols-4 gap-8">
@@ -183,28 +188,32 @@ export default function ServicesGrid() {
                 step: "01",
                 title: "Análise",
                 desc: "Avaliação completa da sua infraestrutura atual",
+                bgColor: "bg-tech-cyan"
               },
               {
                 step: "02",
                 title: "Estratégia",
                 desc: "Desenvolvimento de plano personalizado",
+                bgColor: "bg-tech-cyan"
               },
               {
                 step: "03",
                 title: "Implementação",
                 desc: "Execução com metodologias ágeis",
+                bgColor: "bg-tech-cyan"
               },
               {
                 step: "04",
                 title: "Suporte",
                 desc: "Acompanhamento contínuo e otimização",
+                bgColor: "bg-tech-cyan"
               },
             ].map((item, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-tech-gradient rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+              <div key={index} className="text-center group">
+                <div className={`w-16 h-16 ${item.bgColor} rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl group-hover:scale-110 transition-transform duration-300 animate-pulse-tech`}>
                   {item.step}
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">
+                <h4 className="text-xl font-bold text-gray-900 mb-2 transition-all duration-300">
                   {item.title}
                 </h4>
                 <p className="text-gray-600 text-sm">{item.desc}</p>
