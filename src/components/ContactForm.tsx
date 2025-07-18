@@ -1,7 +1,8 @@
+// src/components/ContactForm.tsx
 "use client";
 
 import { useState, useCallback } from "react";
-import { Mail, Phone, MapPin, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { Mail, Phone, MapPin, CheckCircle, AlertCircle, Loader2, User, Building } from "lucide-react";
 
 // Domain Types
 interface ContactFormData {
@@ -9,7 +10,11 @@ interface ContactFormData {
   email: string;
   company: string;
   phone: string;
-  service: string;
+  cnpj: string;
+  numberOfEmployees: string;
+  state: string;
+  city: string;
+  serviceOfInterest: string;
   message: string;
 }
 
@@ -19,14 +24,27 @@ interface FormErrors {
 
 type SubmissionStatus = 'idle' | 'submitting' | 'success' | 'error';
 
+interface ApiResponse {
+  success: boolean;
+  message: string;
+  salesRepresentative?: {
+    name: string;
+    email: string;
+    region: string;
+  };
+  errors?: any[];
+}
+
 // Validation Service
 class ValidationService {
   private static readonly EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   private static readonly PHONE_REGEX = /^\(\d{2}\)\s\d{4,5}-\d{4}$/;
+  private static readonly CNPJ_REGEX = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
 
   static validateForm(data: ContactFormData): FormErrors {
     const errors: FormErrors = {};
 
+    // Campos obrigatórios
     if (!data.name.trim()) {
       errors.name = "Nome é obrigatório";
     } else if (data.name.length < 2) {
@@ -39,17 +57,43 @@ class ValidationService {
       errors.email = "Email inválido";
     }
 
-    if (data.phone && !this.PHONE_REGEX.test(data.phone)) {
-      errors.phone = "Formato: (11) 99999-9999";
-    }
-
     if (!data.message.trim()) {
       errors.message = "Mensagem é obrigatória";
     } else if (data.message.length < 10) {
       errors.message = "Mensagem deve ter pelo menos 10 caracteres";
     }
 
+    // Campos opcionais com validação
+    if (data.phone && !this.PHONE_REGEX.test(data.phone)) {
+      errors.phone = "Formato: (11) 99999-9999";
+    }
+
+    if (data.cnpj && !this.CNPJ_REGEX.test(data.cnpj)) {
+      errors.cnpj = "Formato: 00.000.000/0000-00";
+    }
+
     return errors;
+  }
+}
+
+// Formatting utilities
+class FormatterUtils {
+  static formatCNPJ(value: string): string {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 14) {
+      return numbers.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+    }
+    return value;
+  }
+
+  static formatPhone(value: string): string {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length === 11) {
+      return numbers.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+    } else if (numbers.length === 10) {
+      return numbers.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3');
+    }
+    return value;
   }
 }
 
@@ -60,15 +104,31 @@ function useContactForm() {
     email: "",
     company: "",
     phone: "",
-    service: "",
+    cnpj: "",
+    numberOfEmployees: "",
+    state: "",
+    city: "",
+    serviceOfInterest: "",
     message: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<SubmissionStatus>('idle');
+  const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
 
   const updateField = useCallback((field: keyof ContactFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const newData = { ...prev, [field]: value };
+      
+      // Auto-format certain fields
+      if (field === 'phone') {
+        newData.phone = FormatterUtils.formatPhone(value);
+      } else if (field === 'cnpj') {
+        newData.cnpj = FormatterUtils.formatCNPJ(value);
+      }
+      
+      return newData;
+    });
     
     // Clear error when user starts typing
     if (errors[field]) {
@@ -86,6 +146,7 @@ function useContactForm() {
     }
 
     setStatus('submitting');
+    setApiResponse(null);
 
     try {
       const response = await fetch('/api/contact', {
@@ -96,7 +157,7 @@ function useContactForm() {
         body: JSON.stringify(formData),
       });
 
-      const result = await response.json();
+      const result: ApiResponse = await response.json();
 
       if (!response.ok) {
         throw new Error(result.message || 'Erro ao enviar formulário');
@@ -108,23 +169,29 @@ function useContactForm() {
           email: "",
           company: "",
           phone: "",
-          service: "",
+          cnpj: "",
+          numberOfEmployees: "",
+          state: "",
+          city: "",
+          serviceOfInterest: "",
           message: "",
         });
         setErrors({});
         setStatus('success');
+        setApiResponse(result);
         
-        // Reset success message after 10 seconds
+        // Reset success message after 15 seconds
         setTimeout(() => {
           setStatus('idle');
-        }, 10000);
+          setApiResponse(null);
+        }, 15000);
       } else {
         throw new Error('Resposta inválida do servidor');
       }
     } catch (error) {
       console.error('Erro ao enviar formulário:', error);
       setStatus('error');
-      setTimeout(() => setStatus('idle'), 5000);
+      setTimeout(() => setStatus('idle'), 8000);
     }
   }, [formData]);
 
@@ -132,6 +199,7 @@ function useContactForm() {
     formData,
     errors,
     status,
+    apiResponse,
     updateField,
     submitForm,
   };
@@ -147,6 +215,8 @@ interface InputFieldProps {
   error?: string;
   placeholder?: string;
   required?: boolean;
+  icon?: React.ReactNode;
+  maxLength?: number;
 }
 
 function InputField({
@@ -158,54 +228,66 @@ function InputField({
   error,
   placeholder,
   required = false,
+  icon,
+  maxLength
 }: InputFieldProps) {
   const inputClassName = `
-    w-full px-4 py-3 border rounded-lg transition-all bg-white
+    w-full px-4 py-3 pl-${icon ? '12' : '4'} border rounded-lg transition-all bg-white
     focus:ring-2 focus:ring-tech-cyan focus:border-transparent
     ${error ? 'border-red-500' : 'border-gray-300 hover:border-tech-cyan/50'}
   `;
 
   return (
-    <div>
+    <div className="relative">
       <label htmlFor={id} className="block text-sm font-semibold text-gray-700 mb-2">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
-      {type === 'textarea' ? (
-        <textarea
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={inputClassName}
-          placeholder={placeholder}
-          rows={5}
-          aria-describedby={error ? `${id}-error` : undefined}
-        />
-      ) : type === 'select' ? (
-        <select
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={inputClassName}
-          aria-describedby={error ? `${id}-error` : undefined}
-        >
-          <option value="">Selecione um serviço</option>
-          <option value="Implementação de Software">Implementação de Software</option>
-          <option value="Treinamentos Microsoft">Treinamentos Microsoft</option>
-          <option value="Cloud Service">Cloud Service</option>
-          <option value="Inteligência Artificial">Inteligência Artificial</option>
-          <option value="Diagnóstico Gratuito">Diagnóstico Gratuito</option>
-        </select>
-      ) : (
-        <input
-          type={type}
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={inputClassName}
-          placeholder={placeholder}
-          aria-describedby={error ? `${id}-error` : undefined}
-        />
-      )}
+      <div className="relative">
+        {icon && (
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+            {icon}
+          </div>
+        )}
+        {type === 'textarea' ? (
+          <textarea
+            id={id}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className={inputClassName}
+            placeholder={placeholder}
+            rows={5}
+            maxLength={maxLength}
+            aria-describedby={error ? `${id}-error` : undefined}
+          />
+        ) : type === 'select' ? (
+          <select
+            id={id}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className={inputClassName}
+            aria-describedby={error ? `${id}-error` : undefined}
+          >
+            <option value="">Selecione um serviço</option>
+            <option value="Implementação de Software">Implementação de Software</option>
+            <option value="Treinamentos Microsoft">Treinamentos Microsoft</option>
+            <option value="Cloud Service">Cloud Service</option>
+            <option value="Inteligência Artificial">Inteligência Artificial</option>
+            <option value="Diagnóstico Gratuito">Diagnóstico Gratuito</option>
+            <option value="Outros">Outros</option>
+          </select>
+        ) : (
+          <input
+            type={type}
+            id={id}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className={inputClassName}
+            placeholder={placeholder}
+            maxLength={maxLength}
+            aria-describedby={error ? `${id}-error` : undefined}
+          />
+        )}
+      </div>
       {error && (
         <p id={`${id}-error`} className="text-red-500 text-xs mt-1" role="alert">
           {error}
@@ -239,10 +321,11 @@ function ContactInfo() {
   ];
 
   const benefits = [
-    "Resposta em até 24 horas",
-    "Diagnóstico gratuito sem compromisso",
-    "Parceria Microsoft Gold",
-    "+150 projetos entregues com sucesso",
+    "✅ Resposta em até 24 horas",
+    "🆓 Diagnóstico gratuito sem compromisso",
+    "🏆 Parceria Microsoft Gold Partner",
+    "📈 +150 projetos entregues com sucesso",
+    "🔒 Dados protegidos e seguros",
   ];
 
   return (
@@ -296,17 +379,13 @@ function ContactInfo() {
           <span className="text-xl">🎯</span>
           Por que nos escolher?
         </h4>
-        <ul className="space-y-2 text-sm text-gray-600">
+        <ul className="space-y-3 text-sm text-gray-600">
           {benefits.map((benefit, index) => (
             <li
               key={index}
               className="flex items-center hover:text-gray-800 transition-colors"
             >
-              <span
-                className="w-2 h-2 bg-tech-gradient rounded-full mr-3 animate-pulse"
-                style={{ animationDelay: `${index * 200}ms` }}
-              ></span>
-              {benefit}
+              <span className="mr-2">{benefit}</span>
             </li>
           ))}
         </ul>
@@ -316,19 +395,35 @@ function ContactInfo() {
 }
 
 // Status Message Component
-function StatusMessage({ status }: { status: SubmissionStatus }) {
-  if (status === 'success') {
+function StatusMessage({ status, apiResponse }: { 
+  status: SubmissionStatus; 
+  apiResponse: ApiResponse | null; 
+}) {
+  if (status === 'success' && apiResponse) {
     return (
-      <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-        <div className="flex items-center">
-          <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-          <div>
-            <h4 className="font-semibold text-green-800">
-              Mensagem enviada com sucesso!
+      <div className="mb-6 p-6 bg-green-50 border border-green-200 rounded-lg">
+        <div className="flex items-start">
+          <CheckCircle className="w-6 h-6 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
+            <h4 className="font-semibold text-green-800 mb-2">
+              🎉 Mensagem enviada com sucesso!
             </h4>
-            <p className="text-green-700 text-sm">
-              Entraremos em contato em breve.
+            <p className="text-green-700 text-sm mb-3">
+              {apiResponse.message}
             </p>
+            
+            {apiResponse.salesRepresentative && (
+              <div className="bg-green-100 p-3 rounded-md">
+                <p className="text-green-800 text-sm font-medium mb-1">
+                  👤 Seu contato será direcionado para:
+                </p>
+                <div className="text-green-700 text-sm">
+                  <p><strong>{apiResponse.salesRepresentative.name}</strong></p>
+                  <p>📧 {apiResponse.salesRepresentative.email}</p>
+                  <p>🌎 Região: {apiResponse.salesRepresentative.region}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -345,7 +440,7 @@ function StatusMessage({ status }: { status: SubmissionStatus }) {
               Erro ao enviar mensagem
             </h4>
             <p className="text-red-700 text-sm">
-              Tente novamente ou use nosso email diretamente.
+              Tente novamente ou use nosso email diretamente: contato@alltechdigital.com
             </p>
           </div>
         </div>
@@ -358,7 +453,37 @@ function StatusMessage({ status }: { status: SubmissionStatus }) {
 
 // Main Component
 export default function ContactForm() {
-  const { formData, errors, status, updateField, submitForm } = useContactForm();
+  const { formData, errors, status, apiResponse, updateField, submitForm } = useContactForm();
+
+  const estadosBrasileiros = [
+    { code: 'AC', name: 'Acre' },
+    { code: 'AL', name: 'Alagoas' },
+    { code: 'AP', name: 'Amapá' },
+    { code: 'AM', name: 'Amazonas' },
+    { code: 'BA', name: 'Bahia' },
+    { code: 'CE', name: 'Ceará' },
+    { code: 'DF', name: 'Distrito Federal' },
+    { code: 'ES', name: 'Espírito Santo' },
+    { code: 'GO', name: 'Goiás' },
+    { code: 'MA', name: 'Maranhão' },
+    { code: 'MT', name: 'Mato Grosso' },
+    { code: 'MS', name: 'Mato Grosso do Sul' },
+    { code: 'MG', name: 'Minas Gerais' },
+    { code: 'PA', name: 'Pará' },
+    { code: 'PB', name: 'Paraíba' },
+    { code: 'PR', name: 'Paraná' },
+    { code: 'PE', name: 'Pernambuco' },
+    { code: 'PI', name: 'Piauí' },
+    { code: 'RJ', name: 'Rio de Janeiro' },
+    { code: 'RN', name: 'Rio Grande do Norte' },
+    { code: 'RS', name: 'Rio Grande do Sul' },
+    { code: 'RO', name: 'Rondônia' },
+    { code: 'RR', name: 'Roraima' },
+    { code: 'SC', name: 'Santa Catarina' },
+    { code: 'SP', name: 'São Paulo' },
+    { code: 'SE', name: 'Sergipe' },
+    { code: 'TO', name: 'Tocantins' }
+  ];
 
   return (
     <section id="contato" className="section-padding bg-gray-100">
@@ -367,97 +492,208 @@ export default function ContactForm() {
           <ContactInfo />
 
           <div className="bg-gray-50 rounded-2xl p-8 tech-border-hover tech-shadow">
-            <StatusMessage status={status} />
+            <StatusMessage status={status} apiResponse={apiResponse} />
 
             <form onSubmit={submitForm} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <InputField
-                  id="name"
-                  label="Nome Completo"
-                  value={formData.name}
-                  onChange={(value) => updateField("name", value)}
-                  error={errors.name}
-                  placeholder="Seu nome completo"
-                  required
-                />
+              {/* Informações Pessoais */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <User className="w-5 h-5 text-tech-cyan" />
+                  Informações Pessoais
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <InputField
+                    id="name"
+                    label="Nome Completo"
+                    value={formData.name}
+                    onChange={(value) => updateField("name", value)}
+                    error={errors.name}
+                    placeholder="Seu nome completo"
+                    required
+                    maxLength={100}
+                  />
 
+                  <InputField
+                    id="email"
+                    label="Email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(value) => updateField("email", value)}
+                    error={errors.email}
+                    placeholder="seu@email.com"
+                    required
+                    maxLength={255}
+                  />
+                </div>
+
+                <div className="mt-6">
+                  <InputField
+                    id="phone"
+                    label="Telefone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(value) => updateField("phone", value)}
+                    error={errors.phone}
+                    placeholder="(11) 9 9999-9999"
+                    icon={<Phone className="w-4 h-4" />}
+                    maxLength={15}
+                  />
+                </div>
+              </div>
+
+              {/* Informações da Empresa */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Building className="w-5 h-5 text-tech-cyan" />
+                  Informações da Empresa (Opcional)
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <InputField
+                    id="company"
+                    label="Nome da Empresa"
+                    value={formData.company}
+                    onChange={(value) => updateField("company", value)}
+                    placeholder="Nome da sua empresa"
+                    maxLength={100}
+                  />
+
+                  <InputField
+                    id="cnpj"
+                    label="CNPJ"
+                    value={formData.cnpj}
+                    onChange={(value) => updateField("cnpj", value)}
+                    error={errors.cnpj}
+                    placeholder="00.000.000/0000-00"
+                    maxLength={18}
+                  />
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-6 mt-6">
+                  <div>
+                    <label htmlFor="numberOfEmployees" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Número de Funcionários
+                    </label>
+                    <select
+                      id="numberOfEmployees"
+                      value={formData.numberOfEmployees}
+                      onChange={(e) => updateField("numberOfEmployees", e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg transition-all bg-white focus:ring-2 focus:ring-tech-cyan focus:border-transparent hover:border-tech-cyan/50"
+                    >
+                      <option value="">Selecione</option>
+                      <option value="1-10">1 a 10</option>
+                      <option value="11-50">11 a 50</option>
+                      <option value="51-100">51 a 100</option>
+                      <option value="101-500">101 a 500</option>
+                      <option value="500+">Mais de 500</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="state" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Estado
+                    </label>
+                    <select
+                      id="state"
+                      value={formData.state}
+                      onChange={(e) => updateField("state", e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg transition-all bg-white focus:ring-2 focus:ring-tech-cyan focus:border-transparent hover:border-tech-cyan/50"
+                    >
+                      <option value="">Selecione</option>
+                      {estadosBrasileiros.map((estado) => (
+                        <option key={estado.code} value={estado.code}>
+                          {estado.code} - {estado.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <InputField
+                    id="city"
+                    label="Cidade"
+                    value={formData.city}
+                    onChange={(value) => updateField("city", value)}
+                    placeholder="Sua cidade"
+                    maxLength={50}
+                  />
+                </div>
+              </div>
+
+              {/* Serviço de Interesse */}
+              <div>
                 <InputField
-                  id="email"
-                  label="Email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(value) => updateField("email", value)}
-                  error={errors.email}
-                  placeholder="seu@email.com"
-                  required
+                  id="serviceOfInterest"
+                  label="Serviço de Interesse"
+                  type="select"
+                  value={formData.serviceOfInterest}
+                  onChange={(value) => updateField("serviceOfInterest", value)}
                 />
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              {/* Mensagem */}
+              <div>
                 <InputField
-                  id="company"
-                  label="Empresa"
-                  value={formData.company}
-                  onChange={(value) => updateField("company", value)}
-                  placeholder="Nome da sua empresa"
+                  id="message"
+                  label="Mensagem"
+                  type="textarea"
+                  value={formData.message}
+                  onChange={(value) => updateField("message", value)}
+                  error={errors.message}
+                  placeholder="Conte-nos sobre seu projeto, necessidades ou dúvidas. Quanto mais detalhes, melhor poderemos ajudá-lo..."
+                  required
+                  maxLength={1000}
                 />
-
-                <InputField
-                  id="phone"
-                  label="Telefone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(value) => updateField("phone", value)}
-                  error={errors.phone}
-                  placeholder="(11) 9 9999-9999"
-                />
+                <div className="mt-1 text-xs text-gray-500 text-right">
+                  {formData.message.length}/1000 caracteres
+                </div>
               </div>
 
-              <InputField
-                id="service"
-                label="Serviço de Interesse"
-                type="select"
-                value={formData.service}
-                onChange={(value) => updateField("service", value)}
-              />
+              {/* Botão de Envio */}
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={status === 'submitting'}
+                  className={`
+                    w-full btn-primary text-lg py-4 transition-all duration-300 relative overflow-hidden
+                    ${status === 'submitting' 
+                      ? 'opacity-70 cursor-not-allowed' 
+                      : 'animate-gradient hover:scale-105'
+                    }
+                  `}
+                >
+                  {status === 'submitting' ? (
+                    <span className="flex items-center justify-center gap-3">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Enviando sua mensagem...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-2">
+                      <Mail className="w-5 h-5" />
+                      Enviar Mensagem
+                    </span>
+                  )}
+                </button>
+              </div>
 
-              <InputField
-                id="message"
-                label="Mensagem"
-                type="textarea"
-                value={formData.message}
-                onChange={(value) => updateField("message", value)}
-                error={errors.message}
-                placeholder="Conte-nos sobre seu projeto ou necessidade..."
-                required
-              />
+              {/* Política de Privacidade */}
+              <div className="text-center">
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  🔒 Ao enviar este formulário, você concorda com nossa política de privacidade.<br />
+                  Seus dados serão utilizados apenas para entrarmos em contato e são protegidos com criptografia.
+                </p>
+              </div>
 
-              <button
-                type="submit"
-                disabled={status === 'submitting'}
-                className={`
-                  w-full btn-primary text-lg py-4 transition-all duration-300
-                  ${status === 'submitting' 
-                    ? 'opacity-70 cursor-not-allowed' 
-                    : 'animate-gradient hover:scale-105'
-                  }
-                `}
-              >
-                {status === 'submitting' ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Enviando...
-                  </span>
-                ) : (
-                  "Solicitar Contato"
-                )}
-              </button>
-
-              <p className="text-xs text-gray-500 text-center">
-                Ao enviar este formulário, você concorda com nossa política de
-                privacidade. Seus dados serão utilizados apenas para entrarmos
-                em contato.
-              </p>
+              {/* Informações Adicionais */}
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                  💡 Dica para uma resposta mais rápida
+                </h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• Mencione qual tecnologia Microsoft você já usa</li>
+                  <li>• Descreva seu principal desafio tecnológico atual</li>
+                  <li>• Indique se há urgência no projeto</li>
+                  <li>• Inclua informações sobre orçamento (se possível)</li>
+                </ul>
+              </div>
             </form>
           </div>
         </div>

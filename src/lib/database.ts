@@ -64,6 +64,104 @@ class Database {
       return false;
     }
   }
+
+  // Método para verificar se as tabelas necessárias existem
+  public async verifyTables(): Promise<boolean> {
+    try {
+      console.log('🔍 Verificando tabelas necessárias...');
+      const requiredTables = ['sales_representatives', 'companies', 'contacts', 'leads', 'interactions'];
+      const result = await this.query(`
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = ANY($1)
+      `, [requiredTables]);
+      const existingTables = result.rows.map((row: any) => row.table_name);
+      console.log(`📋 Tabelas encontradas: ${existingTables.length}/${requiredTables.length}`);
+      requiredTables.forEach(table => {
+        if (existingTables.includes(table)) {
+          console.log(`   ✅ ${table}`);
+        } else {
+          console.log(`   ❌ ${table} - FALTANDO`);
+        }
+      });
+      if (existingTables.length !== requiredTables.length) {
+        console.log('⚠️ Nem todas as tabelas necessárias foram encontradas');
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('❌ Erro ao verificar tabelas:', error);
+      return false;
+    }
+  }
+
+  // Método para verificar vendedores
+  public async verifySalesReps(): Promise<boolean> {
+    try {
+      console.log('👔 Verificando vendedores...');
+      const result = await this.query('SELECT COUNT(*) as count FROM sales_representatives WHERE is_active = TRUE');
+      const count = parseInt(result.rows[0].count);
+      console.log(`👤 Vendedores ativos encontrados: ${count}`);
+      if (count === 0) {
+        console.log('⚠️ Nenhum vendedor ativo encontrado');
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('❌ Erro ao verificar vendedores:', error);
+      return false;
+    }
+  }
+
+  // Método de diagnóstico completo
+  public async runDiagnostic(): Promise<{
+    connection: boolean;
+    tables: boolean;
+    salesReps: boolean;
+    permissions: boolean;
+  }> {
+    console.log('🏥 Executando diagnóstico completo do banco...');
+    
+    const diagnostic = {
+      connection: false,
+      tables: false,
+      salesReps: false,
+      permissions: false
+    };
+
+    // Teste 1: Conexão
+    diagnostic.connection = await this.testConnection();
+    if (!diagnostic.connection) return diagnostic;
+
+    // Teste 2: Tabelas
+    diagnostic.tables = await this.verifyTables();
+
+    // Teste 3: Vendedores
+    diagnostic.salesReps = await this.verifySalesReps();
+
+    // Teste 4: Permissões básicas
+    try {
+      console.log('🔐 Testando permissões...');
+      await this.query('SELECT 1 FROM sales_representatives LIMIT 1');
+      await this.query('SELECT 1 FROM companies LIMIT 1');
+      await this.query('SELECT 1 FROM contacts LIMIT 1');
+      await this.query('SELECT 1 FROM leads LIMIT 1');
+      console.log('✅ Permissões básicas OK');
+      diagnostic.permissions = true;
+    } catch (error) {
+      console.error('❌ Problemas de permissão:', error);
+      diagnostic.permissions = false;
+    }
+
+    console.log('📊 Resultado do diagnóstico:');
+    console.log(`   🔌 Conexão: ${diagnostic.connection ? '✅' : '❌'}`);
+    console.log(`   📋 Tabelas: ${diagnostic.tables ? '✅' : '❌'}`);
+    console.log(`   👔 Vendedores: ${diagnostic.salesReps ? '✅' : '❌'}`);
+    console.log(`   🔐 Permissões: ${diagnostic.permissions ? '✅' : '❌'}`);
+
+    return diagnostic;
+  }
 }
 
 export default Database;
