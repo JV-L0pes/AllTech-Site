@@ -14,7 +14,7 @@ export default function HeroSection() {
       description:
         "Implementação de software, treinamentos especializados e migração para cloud com resultados garantidos.",
       backgroundClass:
-        "bg-gradient-to-r from-tech-cyan via-tech-green to-tech-darkGreen",
+        "bg-gradient-to-br from-tech-cyan via-tech-electric to-tech-deep",
     },
     {
       id: 2,
@@ -23,7 +23,7 @@ export default function HeroSection() {
       description:
         "Acesso às mais recentes tecnologias e suporte técnico especializado direto da Microsoft.",
       backgroundClass:
-        "bg-gradient-to-r from-tech-darkGreen via-tech-green to-tech-cyan",
+        "bg-gradient-to-br from-tech-deep via-tech-indigo to-tech-violet",
     },
     {
       id: 3,
@@ -32,7 +32,7 @@ export default function HeroSection() {
       description:
         "Análise completa, implementação personalizada e acompanhamento contínuo para o sucesso do seu negócio.",
       backgroundClass:
-        "bg-gradient-to-r from-tech-green via-tech-cyan to-tech-darkGreen",
+        "bg-gradient-to-br from-tech-indigo via-tech-violet to-tech-electric",
     },
   ];
 
@@ -49,6 +49,9 @@ export default function HeroSection() {
 
   return (
     <section id="inicio" className="relative min-h-screen overflow-hidden">
+      {/* Partículas flutuantes de fundo */}
+      <div className="absolute inset-0 hero-particles"></div>
+      
       {slides.map((slide, index) => (
         <div
           key={slide.id}
@@ -56,26 +59,31 @@ export default function HeroSection() {
             index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-105"
           }`}
         >
-          <div className={`hero-slide ${slide.backgroundClass}`}>
-            <div className="hero-overlay bg-gradient-to-b from-black/30 via-black/50 to-black/40"></div>
+          <div className={`hero-slide ${slide.backgroundClass} tech-element`}>
+            {/* Overlay com gradiente moderno */}
+            <div className="hero-overlay bg-gradient-to-b from-black/20 via-black/30 to-black/40"></div>
+
+            {/* Efeitos de luz nos cantos */}
+            <div className="absolute top-0 left-0 w-96 h-96 bg-tech-radial opacity-20 blur-3xl"></div>
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-tech-gradient-reverse opacity-20 blur-3xl"></div>
 
             <div className="hero-content">
               <div className="animate-fade-in-up">
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
                   {slide.title}
                 </h1>
-                <h2 className="text-xl md:text-2xl lg:text-3xl text-green-100 font-semibold mb-6 drop-shadow-md">
+                <h2 className="text-xl md:text-2xl lg:text-3xl text-blue-100 font-semibold mb-6 drop-shadow-md">
                   {slide.subtitle}
                 </h2>
-                <p className="text-lg md:text-xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed drop-shadow-sm">
+                <p className="text-lg md:text-xl text-cyan-100 mb-8 max-w-3xl mx-auto leading-relaxed drop-shadow-sm">
                   {slide.description}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                  <button className="btn-primary text-lg px-8 py-4 w-full sm:w-auto animate-gradient hover:scale-105 transition-all duration-300 animate-pulse-tech">
+                  <button className="btn-primary text-lg px-8 py-4 w-full sm:w-auto tech-glow">
                     Solicitar Diagnóstico Gratuito
                   </button>
-                  <button className="bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white hover:bg-white hover:text-tech-cyan font-semibold py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 w-full sm:w-auto">
+                  <button className="bg-white/10 backdrop-blur-sm border-2 border-white/20 text-white hover:bg-white hover:text-tech-deep font-semibold py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 w-full sm:w-auto tech-pulse">
                     Ver Cases de Sucesso
                   </button>
                 </div>
@@ -85,7 +93,7 @@ export default function HeroSection() {
         </div>
       ))}
 
-      {/* Indicadores */}
+      {/* Indicadores modernos */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
         {slides.map((_, index) => (
           <button
@@ -93,33 +101,38 @@ export default function HeroSection() {
             onClick={() => goToSlide(index)}
             className={`h-3 rounded-full transition-all duration-300 ${
               index === currentSlide
-                ? "bg-tech-gradient w-8 animate-pulse"
+                ? "bg-tech-gradient w-8 tech-glow"
                 : "bg-white/50 hover:bg-white/70 w-3"
             }`}
           />
         ))}
       </div>
 
-      {/* Setas */}
+      {/* Setas com novo design */}
       <button
         onClick={() =>
           goToSlide((currentSlide - 1 + slides.length) % slides.length)
         }
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-all duration-300 text-4xl font-light hover:scale-110"
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-all duration-300 text-4xl font-light hover:scale-110 hover:drop-shadow-lg"
       >
         ‹
       </button>
       <button
         onClick={() => goToSlide((currentSlide + 1) % slides.length)}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-all duration-300 text-4xl font-light hover:scale-110"
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-all duration-300 text-4xl font-light hover:scale-110 hover:drop-shadow-lg"
       >
         ›
       </button>
 
-      {/* Floating elements for visual appeal */}
-      <div className="absolute top-20 left-10 w-2 h-2 bg-tech-green rounded-full animate-pulse opacity-60"></div>
-      <div className="absolute top-40 right-20 w-3 h-3 bg-tech-cyan rounded-full animate-pulse opacity-40 animation-delay-1000"></div>
-      <div className="absolute bottom-20 left-20 w-2 h-2 bg-tech-darkGreen rounded-full animate-pulse opacity-50 animation-delay-2000"></div>
+      {/* Elementos decorativos flutuantes */}
+      <div className="absolute top-20 left-10 w-2 h-2 bg-tech-cyan rounded-full animate-pulse opacity-60 floating-dots"></div>
+      <div className="absolute top-40 right-20 w-3 h-3 bg-tech-electric rounded-full animate-pulse opacity-40" style={{animationDelay: '1s'}}></div>
+      <div className="absolute bottom-20 left-20 w-2 h-2 bg-tech-indigo rounded-full animate-pulse opacity-50" style={{animationDelay: '2s'}}></div>
+      <div className="absolute top-60 left-1/3 w-1 h-1 bg-tech-violet rounded-full animate-pulse opacity-70" style={{animationDelay: '3s'}}></div>
+      <div className="absolute bottom-40 right-1/4 w-2 h-2 bg-tech-deep rounded-full animate-pulse opacity-60" style={{animationDelay: '4s'}}></div>
+
+      {/* Linha de código decorativa */}
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-tech-gradient opacity-50"></div>
     </section>
   );
 }

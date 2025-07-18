@@ -20,32 +20,33 @@ export default function Header() {
   return (
     <header className={`backdrop-blur-sm fixed w-full top-0 z-50 border-b transition-all duration-300 ${
       isScrolled 
-        ? 'bg-gray-100/95 border-gray-300 shadow-xl' 
-        : 'bg-gray-100/95 border-gray-300 shadow-lg'
+        ? 'bg-white/95 border-gray-200 shadow-xl' 
+        : 'bg-white/95 border-gray-200 shadow-lg'
     }`}>
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-3">
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex items-center gap-3">
-              {/* Logo da empresa */}
+              {/* Logo com CSS blend para remover fundo branco */}
               <Image
                 src="/images/Alltech-logo.png"
                 alt="AllTech Digital"
                 width={52}
                 height={52}
-                className="drop-shadow-sm hover:scale-105 transition-transform duration-200"
+                className="logo-no-background drop-shadow-sm hover:scale-105 transition-transform duration-200"
                 priority
               />
-              {/* Texto da marca - seguindo o design original */}
+
+              {/* Texto da marca - seguindo o design original com novo tema */}
               <div className="flex items-center">
-                <span className="text-2xl font-bold text-gray-900 tracking-tight">
+                <span className="text-2xl font-bold text-gray-900 tracking-tight hover-text-gradient transition-all duration-300">
                   All
                 </span>
-                <span className="text-2xl font-bold text-gray-900 tracking-tight">
+                <span className="text-2xl font-bold text-gray-900 tracking-tight hover-text-gradient transition-all duration-300">
                   Tech
                 </span>
-                <span className="text-lg font-light text-gray-600 ml-2">
+                <span className="text-lg font-light text-tech-deep ml-2 hover-text-gradient transition-all duration-300">
                   Digital
                 </span>
               </div>
@@ -89,7 +90,7 @@ export default function Header() {
             <a
               href="https://www.instagram.com/alltech.digital/"
               title="Instagram"
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 hover:bg-tech-gradient transition-all duration-300 group hover:scale-110"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group hover:scale-110 tech-pulse"
               target="_blank" rel="noopener noreferrer"
             >
               <Instagram className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
@@ -97,18 +98,18 @@ export default function Header() {
             <a
               href="#"
               title="LinkedIn"
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 hover:bg-tech-gradient transition-all duration-300 group hover:scale-110"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group hover:scale-110 tech-pulse"
             >
               <Linkedin className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
             </a>
-            <button className="btn-primary animate-gradient ml-2 hover:scale-105 transition-transform duration-300">
+            <button className="btn-primary animate-gradient ml-2 hover:scale-105 transition-transform duration-300 tech-glow">
               Diagnóstico Gratuito
             </button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 text-2xl text-gray-700 hover:text-tech-gradient transition-colors"
+            className="md:hidden p-2 text-2xl text-gray-700 hover-text-gradient transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? "✕" : "☰"}
@@ -117,32 +118,32 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden pb-4 border-t border-gray-300 mt-4 pt-4 bg-gray-100 rounded-b-lg">
+          <div className="md:hidden pb-4 border-t border-gray-200 mt-4 pt-4 bg-white/95 rounded-b-lg backdrop-blur-sm">
             <nav className="flex flex-col space-y-4">
               <a
                 href="#inicio"
-                className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium py-2 px-4 rounded-md hover:bg-gray-200"
+                className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium py-2 px-4 rounded-md hover:bg-gray-100"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Início
               </a>
               <a
                 href="#servicos"
-                className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium py-2 px-4 rounded-md hover:bg-gray-200"
+                className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium py-2 px-4 rounded-md hover:bg-gray-100"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Serviços
               </a>
               <a
                 href="#depoimentos"
-                className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium py-2 px-4 rounded-md hover:bg-gray-200"
+                className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium py-2 px-4 rounded-md hover:bg-gray-100"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Depoimentos
               </a>
               <a
                 href="#contato"
-                className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium py-2 px-4 rounded-md hover:bg-gray-200"
+                className="text-gray-700 hover-text-gradient transition-all duration-300 font-medium py-2 px-4 rounded-md hover:bg-gray-100"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contato
@@ -151,7 +152,7 @@ export default function Header() {
                 <a
                   href="https://www.instagram.com/alltech.digital/"
                   title="Instagram"
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 hover:bg-tech-gradient transition-all duration-300 group"
+                  className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group tech-pulse"
                   target="_blank" rel="noopener noreferrer"
                 >
                   <Instagram className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
@@ -159,12 +160,12 @@ export default function Header() {
                 <a
                   href="#"
                   title="LinkedIn"
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 hover:bg-tech-gradient transition-all duration-300 group"
+                  className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group tech-pulse"
                 >
                   <Linkedin className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
                 </a>
               </div>
-              <button className="btn-primary w-full animate-gradient">
+              <button className="btn-primary w-full animate-gradient tech-glow">
                 Diagnóstico Gratuito
               </button>
             </nav>
