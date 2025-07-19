@@ -37,7 +37,7 @@ export default function HeroSection() {
     },
   ];
 
-  // Transição otimizada
+  // Transição ultra-otimizada
   const goToSlide = useCallback((index: number) => {
     if (isTransitioning || index === currentSlide) return;
     
@@ -47,10 +47,10 @@ export default function HeroSection() {
     requestAnimationFrame(() => {
       setCurrentSlide(index);
       
-      // Reset transition flag
+      // Reset transition flag com timing otimizado
       setTimeout(() => {
         setIsTransitioning(false);
-      }, 700);
+      }, 800);
     });
   }, [currentSlide, isTransitioning]);
 
@@ -86,9 +86,9 @@ export default function HeroSection() {
                   isPrev ? '-100%' : '100%'
                 }) translateZ(0)`,
                 opacity: isActive ? 1 : 0,
-                // Transição mais rápida e suave
-                transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease-out',
-                zIndex: isActive ? 10 : 1,
+                // Transição ultra-suave com easing personalizado
+                transition: 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                zIndex: isActive ? 15 : 1,
               }}
             >
               <div className={`hero-slide ${slide.backgroundClass} tech-element`}>
@@ -135,7 +135,7 @@ export default function HeroSection() {
       </div>
 
       {/* Indicadores modernos */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-30">
         {slides.map((_, index) => (
           <button
             key={index}
@@ -156,7 +156,7 @@ export default function HeroSection() {
           goToSlide((currentSlide - 1 + slides.length) % slides.length)
         }
         disabled={isTransitioning}
-        className={`absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-all duration-300 text-4xl font-light hover:scale-110 hover:drop-shadow-lg z-20 ${
+        className={`absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-all duration-300 text-4xl font-light hover:scale-110 hover:drop-shadow-lg z-30 ${
           isTransitioning ? 'pointer-events-none opacity-50' : ''
         }`}
       >
@@ -165,19 +165,26 @@ export default function HeroSection() {
       <button
         onClick={() => goToSlide((currentSlide + 1) % slides.length)}
         disabled={isTransitioning}
-        className={`absolute right-4 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-all duration-300 text-4xl font-light hover:scale-110 hover:drop-shadow-lg z-20 ${
+        className={`absolute right-4 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-all duration-300 text-4xl font-light hover:scale-110 hover:drop-shadow-lg z-30 ${
           isTransitioning ? 'pointer-events-none opacity-50' : ''
         }`}
       >
         ›
       </button>
 
-      {/* Elementos decorativos flutuantes */}
-      <div className="absolute top-20 left-10 w-2 h-2 bg-tech-cyan rounded-full animate-pulse opacity-60 floating-dots"></div>
-      <div className="absolute top-40 right-20 w-3 h-3 bg-tech-electric rounded-full animate-pulse opacity-40" style={{animationDelay: '1s'}}></div>
-      <div className="absolute bottom-20 left-20 w-2 h-2 bg-tech-indigo rounded-full animate-pulse opacity-50" style={{animationDelay: '2s'}}></div>
-      <div className="absolute top-60 left-1/3 w-1 h-1 bg-tech-violet rounded-full animate-pulse opacity-70" style={{animationDelay: '3s'}}></div>
-      <div className="absolute bottom-40 right-1/4 w-2 h-2 bg-tech-deep rounded-full animate-pulse opacity-60" style={{animationDelay: '4s'}}></div>
+      {/* Elementos decorativos flutuantes animados */}
+      <div className="absolute top-20 left-10 w-2 h-2 bg-tech-cyan rounded-full animate-float-slow opacity-60 floating-particle" style={{animationDelay: '0s'}}></div>
+      <div className="absolute top-40 right-20 w-3 h-3 bg-tech-electric rounded-full animate-float-medium opacity-40 floating-particle" style={{animationDelay: '1s'}}></div>
+      <div className="absolute bottom-20 left-20 w-2 h-2 bg-tech-indigo rounded-full animate-float-fast opacity-50 floating-particle" style={{animationDelay: '2s'}}></div>
+      <div className="absolute top-60 left-1/3 w-1 h-1 bg-tech-violet rounded-full animate-float-slow opacity-70 floating-particle" style={{animationDelay: '3s'}}></div>
+      <div className="absolute bottom-40 right-1/4 w-2 h-2 bg-tech-deep rounded-full animate-float-medium opacity-60 floating-particle" style={{animationDelay: '4s'}}></div>
+      
+      {/* Bolinhas adicionais para mais movimento */}
+      <div className="absolute top-80 left-1/4 w-1 h-1 bg-tech-cyan rounded-full animate-float-fast opacity-50 floating-particle" style={{animationDelay: '0.5s'}}></div>
+      <div className="absolute top-32 right-1/3 w-2 h-2 bg-tech-electric rounded-full animate-float-slow opacity-30 floating-particle" style={{animationDelay: '1.5s'}}></div>
+      <div className="absolute bottom-60 right-1/6 w-1 h-1 bg-tech-violet rounded-full animate-float-medium opacity-60 floating-particle" style={{animationDelay: '2.5s'}}></div>
+      <div className="absolute top-96 left-2/3 w-2 h-2 bg-tech-indigo rounded-full animate-float-fast opacity-40 floating-particle" style={{animationDelay: '3.5s'}}></div>
+      <div className="absolute bottom-80 left-1/2 w-1 h-1 bg-tech-deep rounded-full animate-float-slow opacity-50 floating-particle" style={{animationDelay: '4.5s'}}></div>
 
       {/* Linha de código decorativa */}
       <div className="absolute bottom-0 left-0 w-full h-1 bg-tech-gradient opacity-50"></div>

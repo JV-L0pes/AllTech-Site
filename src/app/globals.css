@@ -97,7 +97,7 @@ body {
   }
 
   .hero-content {
-    @apply relative z-10 text-center text-white max-w-4xl px-4;
+    @apply relative z-20 text-center text-white max-w-4xl px-4;
     /* Otimização para animações de conteúdo */
     will-change: transform;
     transform: translateZ(0);
@@ -196,11 +196,6 @@ body {
   /* Classes para hover de texto com gradiente */
   .hover-text-gradient {
     @apply transition-all duration-300;
-    cursor: default !important;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
   }
   
   .hover-text-gradient:hover {
@@ -209,7 +204,6 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    cursor: default !important;
   }
 
   /* Efeitos de glow modernos */
@@ -331,6 +325,89 @@ body {
   }
 }
 
+/* Animações de flutuação para as bolinhas do hero */
+@keyframes float-slow {
+  0%, 100% { 
+    transform: translateY(0px) translateX(0px) scale(1) translateZ(0); 
+    opacity: 0.6; 
+  }
+  25% { 
+    transform: translateY(-15px) translateX(10px) scale(1.1) translateZ(0); 
+    opacity: 0.8; 
+  }
+  50% { 
+    transform: translateY(-25px) translateX(-5px) scale(0.9) translateZ(0); 
+    opacity: 1; 
+  }
+  75% { 
+    transform: translateY(-10px) translateX(15px) scale(1.05) translateZ(0); 
+    opacity: 0.7; 
+  }
+}
+
+@keyframes float-medium {
+  0%, 100% { 
+    transform: translateY(0px) translateX(0px) scale(1) translateZ(0); 
+    opacity: 0.5; 
+  }
+  33% { 
+    transform: translateY(-20px) translateX(8px) scale(1.2) translateZ(0); 
+    opacity: 0.8; 
+  }
+  66% { 
+    transform: translateY(-30px) translateX(-12px) scale(0.8) translateZ(0); 
+    opacity: 1; 
+  }
+}
+
+@keyframes float-fast {
+  0%, 100% { 
+    transform: translateY(0px) translateX(0px) scale(1) translateZ(0); 
+    opacity: 0.4; 
+  }
+  20% { 
+    transform: translateY(-12px) translateX(6px) scale(1.15) translateZ(0); 
+    opacity: 0.7; 
+  }
+  40% { 
+    transform: translateY(-22px) translateX(-8px) scale(0.85) translateZ(0); 
+    opacity: 0.9; 
+  }
+  60% { 
+    transform: translateY(-18px) translateX(12px) scale(1.1) translateZ(0); 
+    opacity: 0.6; 
+  }
+  80% { 
+    transform: translateY(-8px) translateX(-4px) scale(0.95) translateZ(0); 
+    opacity: 0.8; 
+  }
+}
+
+/* Classes para as animações de flutuação */
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-float-medium {
+  animation: float-medium 6s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-float-fast {
+  animation: float-fast 4s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Classe para as partículas flutuantes */
+.floating-particle {
+  pointer-events: none;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  z-index: 1;
+}
+
 @keyframes gradient-shift {
   0%, 100% {
     background-position: 0% 50%;
@@ -418,6 +495,15 @@ a, button, input, textarea, select {
   transform: translateZ(0);
 }
 
+/* Garantir que links tenham cursor de ponteiro */
+a {
+  cursor: pointer !important;
+  user-select: auto !important;
+  -webkit-user-select: auto !important;
+  -moz-user-select: auto !important;
+  -ms-user-select: auto !important;
+}
+
 /* Correção específica para footer - remover gradientes das badges */
 footer .bg-tech-gradient,
 footer .animate-gradient,
@@ -456,12 +542,12 @@ h1, h2, h3, h4, h5, h6 {
   -ms-user-select: none;
 }
 
-/* Títulos e spans com efeitos especiais */
+/* Títulos e spans com efeitos especiais - EXCETO links */
 .hero-content h1,
 .hero-content h2,
 .hero-content p,
-span[class*="text-"],
-div[class*="text-gradient"] {
+span[class*="text-"]:not(a),
+div[class*="text-gradient"]:not(a) {
   cursor: default !important;
   user-select: none;
   -webkit-user-select: none;
@@ -515,24 +601,28 @@ div[class*="text-gradient"] {
 .hero-particles::after {
   content: '';
   position: absolute;
-  width: 2px;
-  height: 2px;
+  width: 3px;
+  height: 3px;
   background: linear-gradient(45deg, #06b6d4, #7c3aed);
   border-radius: 50%;
-  animation: particle-float 12s ease-in-out infinite;
+  animation: particle-float 15s ease-in-out infinite;
   will-change: transform, opacity;
+  filter: blur(0.5px);
+  z-index: 1;
 }
 
 .hero-particles::before {
   top: 20%;
   left: 10%;
   animation-delay: 0s;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
 }
 
 .hero-particles::after {
   top: 60%;
   right: 15%;
-  animation-delay: 4s;
+  animation-delay: 7s;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
 }
 
 @keyframes particle-float {
@@ -553,3 +643,4 @@ div[class*="text-gradient"] {
     opacity: 0.9;
   }
 }
+

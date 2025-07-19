@@ -49,6 +49,10 @@ class ValidationService {
       errors.name = "Nome é obrigatório";
     } else if (data.name.length < 2) {
       errors.name = "Nome deve ter pelo menos 2 caracteres";
+    } else if (data.name.trim().split(' ').length < 2) {
+      errors.name = "Por favor, insira seu nome completo (nome e sobrenome)";
+    } else if (data.name.includes('  ')) {
+      errors.name = "Nome não pode conter espaços duplos";
     }
 
     if (!data.email.trim()) {
@@ -249,7 +253,7 @@ function InputField({
       </label>
       <div className="relative">
         {icon && (
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
             {icon}
           </div>
         )}
@@ -540,7 +544,7 @@ export default function ContactForm() {
                     onChange={(value) => updateField("phone", value)}
                     error={errors.phone}
                     placeholder="(11) 9 9999-9999"
-                    icon={<Phone className="w-4 h-4" />}
+                    icon={<Phone className="w-5 h-5 text-tech-cyan" />}
                     maxLength={15}
                   />
                 </div>
