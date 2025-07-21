@@ -89,6 +89,10 @@ body {
     -webkit-transform: translateZ(0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    transition: all 1.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* Melhorias para transição ultra-smooth */
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
   }
 
   .hero-overlay {
@@ -264,6 +268,39 @@ body {
   }
 }
 
+@keyframes crossFade {
+  0% {
+    opacity: 0;
+    transform: scale(1.05) translateZ(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateZ(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(50px) translateZ(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) translateZ(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-50px) translateZ(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) translateZ(0);
+  }
+}
+
 @keyframes smooth-fade-in {
   0% {
     opacity: 0;
@@ -406,6 +443,13 @@ body {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   z-index: 1;
+}
+
+/* Otimização para partículas em dispositivos móveis */
+@media (max-width: 768px) {
+  .floating-particle {
+    display: none; /* Desabilita partículas em mobile para melhor performance */
+  }
 }
 
 @keyframes gradient-shift {
@@ -595,6 +639,20 @@ div[class*="text-gradient"]:not(a) {
   height: 100%;
   overflow: hidden;
   pointer-events: none;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Otimização para hero em dispositivos móveis */
+@media (max-width: 768px) {
+  .hero-particles {
+    display: none; /* Desabilita partículas de fundo em mobile */
+  }
+  
+  .hero-slide {
+    background-size: cover;
+    background-position: center;
+  }
 }
 
 .hero-particles::before,
