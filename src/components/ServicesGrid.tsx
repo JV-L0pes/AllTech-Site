@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronUp, Check, Clock, Users, Zap } from "lucide-react";
+import { navigationService } from "@/lib/navigation-service";
 
 // Domain Types
 interface ServiceFeature {
@@ -570,7 +571,7 @@ export default function ServicesGrid() {
         </div>
 
         {/* Processo de trabalho - Metodologia PDCA */}
-        <div className="mt-16">
+        <div id="metodologia" className="mt-16">
           <h3 className="text-3xl font-bold text-center text-gray-900 mb-6">
             Nossa <span className="text-gradient">Metodologia PDCA</span>
           </h3>
@@ -748,16 +749,12 @@ const ServiceDetailsPanel = ({ service }: { service: ServiceDetails }) => {
             <p className="mb-3 opacity-90 text-xs">Entre em contato para orçamento personalizado</p>
             <div className="space-y-2">
               <button className="bg-white text-tech-cyan font-semibold px-4 py-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover:scale-105 w-full text-xs"
-                onClick={() => {
-                  window.open('https://wa.me/5512992367544?text=Olá! Gostaria de receber um orçamento personalizado.', '_blank');
-                }}
+                onClick={() => navigationService.requestQuote()}
               >
                 Solicitar Orçamento
               </button>
               <button className="bg-white/20 backdrop-blur-sm border border-white/30 text-white font-semibold px-4 py-2 rounded-lg hover:bg-white/30 transition-all duration-300 hover:scale-105 w-full text-xs"
-                onClick={() => {
-                  window.open('https://wa.me/5512992367544?text=Olá! Gostaria de agendar uma reunião para conversar sobre soluções.', '_blank');
-                }}
+                onClick={() => navigationService.requestConsultation()}
               >
                 Agendar Reunião
               </button>

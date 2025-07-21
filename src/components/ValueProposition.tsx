@@ -27,7 +27,7 @@ export default function ValueProposition() {
   ];
 
   return (
-    <section className="section-padding bg-gray-100">
+    <section id="sobre" className="section-padding bg-gray-100">
       <div className="container mx-auto">
         {/* Título principal */}
         <div className="text-center mb-16">
@@ -69,7 +69,7 @@ export default function ValueProposition() {
         </div>
 
         {/* Seção de especialização Microsoft - Melhor contraste */}
-        <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 lg:p-12 text-white shadow-xl">
+        <div id="certificacoes" className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 lg:p-12 text-white shadow-xl">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             <div>
               <h3 className="text-3xl font-bold mb-6 text-white flex items-center gap-3">

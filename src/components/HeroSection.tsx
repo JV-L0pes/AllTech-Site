@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { navigationService } from "@/lib/navigation-service";
 
 // Domain Models - Melhor tipagem
 interface Slide {
@@ -331,12 +332,7 @@ const SlideComponent = ({ slide, isActive, isNext, progress, direction, isTransi
               {slide.ctaPrimary === "Diagnóstico Gratuito" ? (
                 <button
                   className="btn-primary text-lg px-8 py-4 w-full sm:w-auto hover:scale-105 transition-all duration-300"
-                  onClick={() => {
-                    if (typeof window !== 'undefined') {
-                      window.location.hash = '#contato';
-                      preencherMensagem('Olá! Gostaria de solicitar um diagnóstico gratuito da minha infraestrutura.');
-                    }
-                  }}
+                  onClick={() => navigationService.requestDiagnostic()}
                 >
                   {slide.ctaPrimary}
                 </button>
@@ -397,14 +393,6 @@ const ProgressBar = ({ currentSlide, totalSlides, isTransitioning, progress }: {
     </div>
   );
 };
-
-// Função utilitária para preencher textarea de mensagem
-function preencherMensagem(mensagem: string) {
-  setTimeout(() => {
-    const msgField = document.querySelector('textarea[name="mensagem"], textarea#mensagem') as HTMLTextAreaElement | null;
-    if (msgField) msgField.value = mensagem;
-  }, 300);
-}
 
 export default function HeroSection() {
   const isVisible = useVisibilityObserver('inicio');

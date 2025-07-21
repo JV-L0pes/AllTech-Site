@@ -1,14 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-// Função utilitária para preencher textarea de mensagem
-function preencherMensagem(mensagem: string) {
-  setTimeout(() => {
-    const msgField = document.querySelector('textarea[name="mensagem"], textarea#mensagem') as HTMLTextAreaElement | null;
-    if (msgField) msgField.value = mensagem;
-  }, 300);
-}
+import { navigationService } from "@/lib/navigation-service";
 
 export default function TestimonialsSection() {
   const [activePartner, setActivePartner] = useState(0);
@@ -277,12 +270,7 @@ export default function TestimonialsSection() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="btn-primary text-lg px-8 py-4 animate-gradient hover:scale-105 transition-all duration-300"
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  window.location.hash = '#contato';
-                  preencherMensagem('Olá! Gostaria de migrar minha empresa para o Microsoft 365.');
-                }
-              }}
+              onClick={() => navigationService.requestMigration()}
             >
               Começar Minha Migração
             </button>

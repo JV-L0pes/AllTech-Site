@@ -1,6 +1,6 @@
 "use client";
 
-import { Linkedin, Youtube, Instagram, MessageCircle, Mail, Phone, MapPin } from "lucide-react";
+import { Linkedin, Youtube, Instagram, MessageCircle, Mail, Phone, MapPin, Clock } from "lucide-react";
 
 // Função utilitária para preencher textarea de mensagem
 function preencherMensagem(mensagem: string) {
@@ -21,10 +21,10 @@ export default function Footer() {
       { name: "Automação de Processos", href: "#servicos" },
     ],
     company: [
-      { name: "Sobre Nós", href: "#inicio" },
-      { name: "Nossa Metodologia", href: "#servicos" },
+      { name: "Por que Escolher a AllTech", href: "#sobre" },
+      { name: "Nossa Metodologia", href: "#metodologia" },
       { name: "Cases de Sucesso", href: "#depoimentos" },
-      { name: "Certificações", href: "#inicio" },
+      { name: "Certificações da Equipe", href: "#certificacoes" },
     ],
     resources: [
       { name: "Diagnóstico Gratuito", href: "#contato" },
@@ -40,21 +40,18 @@ export default function Footer() {
       Icon: Linkedin, 
       href: "https://www.linkedin.com/company/alltechdigital/", 
       hoverColor: "hover:bg-blue-600", 
-      iconColor: "group-hover:text-white" 
     },
     { 
       name: "Instagram", 
       Icon: Instagram, 
       href: "https://www.instagram.com/alltech.digital/", 
       hoverColor: "hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500", 
-      iconColor: "group-hover:text-white" 
     },
     { 
       name: "WhatsApp", 
       Icon: MessageCircle, 
       href: "https://wa.me/5512992367544", 
       hoverColor: "hover:bg-green-500", 
-      iconColor: "group-hover:text-white" 
     },
   ];
 
@@ -62,10 +59,10 @@ export default function Footer() {
     <footer className="bg-gray-800 text-gray-300">
       {/* Seção principal do footer */}
       <div className="container mx-auto px-4 py-16">
-        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-8">
-          {/* Informações da empresa - com título e ícones melhorados */}
+        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-12">
+          
+          {/* Coluna 1: Informações da empresa */}
           <div className="lg:col-span-1">
-            {/* Título com ícone para a descrição */}
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white text-xl">🚀</span>
@@ -78,51 +75,62 @@ export default function Footer() {
               através de soluções seguras e metodologia PDCA comprovada.
             </p>
 
-            {/* Informações de contato - ícones mais vibrantes */}
+            {/* Informações de contato - Layout limpo */}
             <div className="space-y-4">
-              <div className="flex items-center gap-4 hover:text-white transition-colors group">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors duration-300">
-                  <Mail className="w-5 h-5 text-white" />
+              {/* Email */}
+              <div className="group">
+                <div className="flex items-start gap-4 hover:text-white transition-colors">
+                  <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors duration-300 flex-shrink-0 mt-0">
+                    <Mail className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-400 mb-1">Email</p>
+                    <a
+                      href="mailto:ulysses.lima@alltechbr.solutions"
+                      className="text-gray-300 hover:text-white transition-colors font-medium text-sm break-all"
+                    >
+                      ulysses.lima@alltechbr.solutions
+                    </a>
+                  </div>
                 </div>
-                <a
-                  href="mailto:ulysses.lima@alltechbr.solutions"
-                  className="hover:text-white transition-colors font-medium text-gray-300"
-                >
-                  ulysses.lima@alltechbr.solutions
-                </a>
               </div>
-              <div className="flex items-center gap-4 hover:text-white transition-colors group">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors duration-300">
-                  <Phone className="w-5 h-5 text-white" />
-                </div>
-                <a
-                  href="https://wa.me/5512992367544"
-                  className="hover:text-white transition-colors font-medium text-gray-300"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  (12) 99236-7544
-                </a>
-              </div>
-              <div className="flex items-center gap-4 hover:text-white transition-colors group">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors duration-300">
-                  <MapPin className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-medium text-gray-300">Atendimento Mundial</span>
-              </div>
-            </div>
 
-            {/* Horário de atendimento */}
-            <div className="mt-6 bg-gray-700/50 rounded-lg p-4">
-              <h4 className="text-white font-semibold mb-2 flex items-center gap-2">
-                🕒 Horário de Atendimento
-              </h4>
-              <p className="text-gray-300 text-sm">Segunda a Sexta: 9h às 18h</p>
-              <p className="text-gray-300 text-sm">Suporte crítico 24/7 conforme necessidade</p>
+              {/* Telefone */}
+              <div className="group">
+                <div className="flex items-start gap-4 hover:text-white transition-colors">
+                  <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors duration-300 flex-shrink-0">
+                    <Phone className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-400 mb-1">WhatsApp</p>
+                    <a
+                      href="https://wa.me/5512992367544"
+                      className="text-gray-300 hover:text-white transition-colors font-medium text-sm"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      (12) 99236-7544
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Localização */}
+              <div className="group">
+                <div className="flex items-start gap-4 hover:text-white transition-colors">
+                  <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors duration-300 flex-shrink-0">
+                    <MapPin className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-400 mb-1">Atendimento</p>
+                    <span className="text-gray-300 font-medium text-sm">Atendimento Mundial</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Serviços */}
+          {/* Coluna 2: Nossos Serviços */}
           <div>
             <h4 className="text-lg font-semibold text-white mb-6">Nossos Serviços</h4>
             <ul className="space-y-3">
@@ -130,7 +138,7 @@ export default function Footer() {
                 <li key={index}>
                   <a
                     href={link.href}
-                    className="text-gray-400 hover:text-white hover-text-gradient transition-all duration-300 text-sm relative group"
+                    className="text-gray-400 hover:text-white transition-all duration-300 text-sm relative group"
                   >
                     {link.name}
                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
@@ -139,17 +147,22 @@ export default function Footer() {
               ))}
             </ul>
 
-            {/* Destaque para serviço principal */}
-            <div className="mt-6 bg-blue-600/20 border border-blue-500/30 rounded-lg p-4">
-              <h5 className="text-white font-semibold mb-2">🌟 Destaque</h5>
-              <p className="text-blue-200 text-sm">
-                <strong>Migração Microsoft 365</strong><br />
+            {/* Serviço em destaque */}
+            <div className="mt-8 bg-blue-600/10 border border-blue-500/20 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-yellow-400 text-lg">🌟</span>
+                <h5 className="text-white font-semibold text-sm">Destaque</h5>
+              </div>
+              <p className="text-blue-200 text-xs mb-2">
+                <strong>Migração Microsoft 365</strong>
+              </p>
+              <p className="text-blue-300 text-xs">
                 Diagnóstico gratuito incluído
               </p>
             </div>
           </div>
 
-          {/* Empresa */}
+          {/* Coluna 3: Empresa */}
           <div>
             <h4 className="text-lg font-semibold text-white mb-6">Empresa</h4>
             <ul className="space-y-3">
@@ -157,7 +170,7 @@ export default function Footer() {
                 <li key={index}>
                   <a
                     href={link.href}
-                    className="text-gray-400 hover:text-white hover-text-gradient transition-all duration-300 text-sm relative group"
+                    className="text-gray-400 hover:text-white transition-all duration-300 text-sm relative group"
                   >
                     {link.name}
                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
@@ -167,10 +180,10 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Recursos */}
+          {/* Coluna 4: Recursos + Horários */}
           <div>
             <h4 className="text-lg font-semibold text-white mb-6">Recursos</h4>
-            <ul className="space-y-3 mb-6">
+            <ul className="space-y-3 mb-8">
               {footerLinks.resources.map((link, index) => (
                 <li key={index}>
                   {link.name === 'Diagnóstico Gratuito' ? (
@@ -186,7 +199,7 @@ export default function Footer() {
                           }, 300);
                         }
                       }}
-                      className="text-gray-400 hover:text-white hover-text-gradient transition-all duration-300 text-sm relative group"
+                      className="text-gray-400 hover:text-white transition-all duration-300 text-sm relative group"
                     >
                       {link.name}
                       <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
@@ -194,7 +207,7 @@ export default function Footer() {
                   ) : (
                     <a
                       href={link.href}
-                      className="text-gray-400 hover:text-white hover-text-gradient transition-all duration-300 text-sm relative group"
+                      className="text-gray-400 hover:text-white transition-all duration-300 text-sm relative group"
                     >
                       {link.name}
                       <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
@@ -204,13 +217,28 @@ export default function Footer() {
               ))}
             </ul>
 
-            {/* Metodologia destaque */}
-            <div className="bg-gray-700/50 rounded-lg p-4">
-              <h5 className="text-white font-semibold mb-2 flex items-center gap-2">
-                🔄 Metodologia PDCA
-              </h5>
-              <p className="text-gray-300 text-xs">
-                Plan • Do • Check • Act<br />
+            {/* Horário de atendimento - melhor posicionado */}
+            <div className="bg-gray-700/50 border border-gray-600 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Clock className="w-4 h-4 text-blue-400" />
+                <h5 className="text-white font-semibold text-sm">Horário de Atendimento</h5>
+              </div>
+              <div className="space-y-1">
+                <p className="text-gray-300 text-xs">Segunda a Sexta: 9h às 18h</p>
+                <p className="text-gray-400 text-xs">Suporte crítico 24/7 conforme necessidade</p>
+              </div>
+            </div>
+
+            {/* Metodologia PDCA - reorganizada */}
+            <div className="mt-6 bg-gray-700/30 border border-gray-600/50 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-blue-400 text-sm">🔄</span>
+                <h5 className="text-white font-semibold text-sm">Metodologia PDCA</h5>
+              </div>
+              <p className="text-gray-400 text-xs mb-1">
+                Plan • Do • Check • Act
+              </p>
+              <p className="text-gray-400 text-xs">
                 Resultados consistentes e melhoria contínua
               </p>
             </div>
@@ -220,36 +248,60 @@ export default function Footer() {
 
       {/* Rodapé inferior */}
       <div className="border-t border-gray-700 bg-gray-900">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
-            <div>
-              © {currentYear} AllTech Digital. Todos os direitos reservados.
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            
+            {/* Copyright */}
+            <div className="text-center md:text-left">
+              <p className="text-sm text-gray-400">
+                © {currentYear} AllTech Digital. Todos os direitos reservados.
+              </p>
             </div>
 
-            {/* Informações adicionais */}
-            <div className="flex gap-6">
+            {/* Redes sociais - Design limpo e moderno */}
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-500 mr-2">Siga-nos:</span>
+              {socialLinks.map((social, index) => {
+                const IconComponent = social.Icon;
+                return (
+                  <a
+                    key={index}
+                    href={social.href}
+                    title={`Siga-nos no ${social.name}`}
+                    className="group relative flex items-center justify-center w-10 h-10 rounded-lg bg-gray-700/50 border border-gray-600 text-gray-400 hover:text-white hover:border-blue-500 hover:bg-blue-600/20 transition-all duration-300"
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    <IconComponent className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                    
+                    {/* Tooltip sutil */}
+                    <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+                      {social.name}
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+
+            {/* Links legais */}
+            <div className="flex flex-col sm:flex-row gap-4 text-center">
               <a 
                 href="/politica-de-privacidade" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="hover:text-white hover-text-gradient transition-all duration-300 relative group"
+                className="text-gray-400 hover:text-blue-400 transition-all duration-300 text-sm font-medium"
               >
                 Política de Privacidade
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </a>
+              <span className="hidden sm:block text-gray-600">•</span>
               <a 
                 href="/termos-de-uso" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="hover:text-white hover-text-gradient transition-all duration-300 relative group"
+                className="text-gray-400 hover:text-blue-400 transition-all duration-300 text-sm font-medium"
               >
                 Termos de Uso
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </a>
-            </div>
-
-            <div className="text-xs text-center md:text-right">
-              <p>Desenvolvido com ❤️ pela equipe AllTech Digital</p>
             </div>
           </div>
         </div>

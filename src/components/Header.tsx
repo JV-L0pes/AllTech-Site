@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { navigationService } from "@/lib/navigation-service";
 import Image from "next/image";
 import { Instagram, Linkedin, MessageCircle } from "lucide-react";
 
@@ -112,15 +113,7 @@ export default function Header() {
               <MessageCircle className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
             </a>
             <button className="btn-primary animate-gradient ml-2 hover:scale-105 transition-transform duration-300 tech-glow"
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  window.location.hash = '#contato';
-                  setTimeout(() => {
-                    const msgField = document.querySelector('textarea[name="mensagem"], textarea#mensagem') as HTMLTextAreaElement | null;
-                    if (msgField) msgField.value = 'Olá! Gostaria de solicitar um diagnóstico gratuito da minha infraestrutura.';
-                  }, 300);
-                }
-              }}
+              onClick={() => navigationService.requestDiagnostic()}
             >
               Diagnóstico Gratuito
             </button>
@@ -213,15 +206,7 @@ export default function Header() {
               </div>
 
               <button className="btn-primary w-full animate-gradient tech-glow"
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.location.hash = '#contato';
-                    setTimeout(() => {
-                      const msgField = document.querySelector('textarea[name="mensagem"], textarea#mensagem') as HTMLTextAreaElement | null;
-                      if (msgField) msgField.value = 'Olá! Gostaria de solicitar um diagnóstico gratuito da minha infraestrutura.';
-                    }, 300);
-                  }
-                }}
+                onClick={() => navigationService.requestDiagnostic()}
               >
                 Diagnóstico Gratuito
               </button>
