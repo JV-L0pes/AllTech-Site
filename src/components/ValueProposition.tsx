@@ -1,28 +1,28 @@
 export default function ValueProposition() {
   const features = [
     {
-      icon: "📊",
-      title: "Análise Completa",
+      icon: "🔄",
+      title: "Metodologia PDCA",
       description:
-        "Mapeamento detalhado da sua infraestrutura atual e identificação de oportunidades de melhoria.",
+        "Plan, Do, Check, Act - Nossa metodologia comprovada garante execução controlada e melhoria contínua em cada projeto.",
     },
     {
-      icon: "🎯",
-      title: "Estratégia Personalizada",
+      icon: "🛡️",
+      title: "Migração Segura",
       description:
-        "Plano de ação sob medida para suas necessidades específicas e objetivos de negócio.",
+        "100% dos dados preservados durante migração para Microsoft 365. Zero downtime e validação completa de integridade.",
     },
     {
       icon: "⚡",
-      title: "Implementação Ágil",
+      title: "Entrega Ágil",
       description:
-        "Execução rápida e eficiente com metodologias comprovadas e melhores práticas.",
+        "Projetos de migração concluídos em 2-6 semanas com metodologia ágil e execução por lotes controlados.",
     },
     {
-      icon: "📈",
-      title: "Resultados Mensuráveis",
+      icon: "🎯",
+      title: "Foco Especializado",
       description:
-        "Acompanhamento contínuo com métricas claras e relatórios de performance.",
+        "Especializados em empresas de 50-500 colaboradores. Entrega com empatia, responsabilidade e suporte completo.",
     },
   ];
 
@@ -36,19 +36,19 @@ export default function ValueProposition() {
             <span className="text-gradient">AllTech Digital</span>?
           </h2>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-            Oferecemos soluções completas e personalizadas, desde a análise de
-            mercado e definição de estratégias até a implementação de campanhas
-            de alta performance e otimização contínua com IA. Não se trata
-            apenas de ferramentas, mas de uma
+            Somos especialistas em{" "}
             <span className="text-tech-cyan font-semibold">
-              {" "}
-              parceria focada em resultados mensuráveis
+              migração para Microsoft 365
             </span>{" "}
-            e crescimento sustentável para o seu negócio.
+            com metodologia PDCA comprovada. Oferecemos uma{" "}
+            <span className="text-tech-cyan font-semibold">
+              parceria focada em resultados seguros
+            </span>{" "}
+            e modernização da sua infraestrutura de TI.
           </p>
         </div>
 
-        {/* Grid de características */}
+        {/* Grid de características principais */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {features.map((feature, index) => (
             <div
@@ -68,73 +68,75 @@ export default function ValueProposition() {
           ))}
         </div>
 
-        {/* Seção de destaque */}
-        <div className="bg-gray-50 rounded-2xl p-8 lg:p-12 tech-border-hover tech-shadow">
+        {/* Seção de especialização Microsoft - Melhor contraste */}
+        <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 lg:p-12 text-white shadow-xl">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             <div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-6">
-                Parceria <span className="text-tech-cyan font-bold">Microsoft Gold</span>
+              <h3 className="text-3xl font-bold mb-6 text-white flex items-center gap-3">
+                <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center">
+                  <span className="text-gray-900 text-2xl">🏆</span>
+                </div>
+                Especialistas Microsoft Certificados
               </h3>
-              <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                Como parceiros oficiais Gold da Microsoft, temos acesso
-                privilegiado às mais recentes tecnologias, treinamentos
-                exclusivos e suporte técnico especializado. Isso garante que
-                nossos clientes sempre recebam soluções de ponta com a máxima
-                qualidade e confiabilidade.
+              <p className="text-gray-300 text-lg leading-relaxed mb-6">
+                Nossa equipe possui certificações oficiais Microsoft e experiência comprovada 
+                em projetos de migração. Garantimos implementações seguras seguindo as 
+                melhores práticas recomendadas pela Microsoft.
               </p>
-              <ul className="space-y-3">
-                <li className="flex items-center text-gray-700 hover:text-gray-900 transition-colors">
-                  <span className="w-2 h-2 bg-tech-gradient rounded-full mr-3 animate-pulse"></span>
-                  Acesso antecipado a novas tecnologias Microsoft
-                </li>
-                <li className="flex items-center text-gray-700 hover:text-gray-900 transition-colors">
-                  <span className="w-2 h-2 bg-tech-gradient rounded-full mr-3 animate-pulse animation-delay-200"></span>
-                  Suporte técnico direto da Microsoft
-                </li>
-                <li className="flex items-center text-gray-700 hover:text-gray-900 transition-colors">
-                  <span className="w-2 h-2 bg-tech-gradient rounded-full mr-3 animate-pulse animation-delay-400"></span>
-                  Certificações e treinamentos exclusivos
-                </li>
-                <li className="flex items-center text-gray-700 hover:text-gray-900 transition-colors">
-                  <span className="w-2 h-2 bg-tech-gradient rounded-full mr-3 animate-pulse animation-delay-600"></span>
-                  Descontos especiais em licenças
-                </li>
-              </ul>
+              <div className="grid gap-4">
+                <div className="bg-gray-800/50 rounded-lg p-4 border-l-4 border-blue-400">
+                  <h4 className="text-blue-400 font-semibold mb-1">Certificações Microsoft</h4>
+                  <p className="text-white text-sm">AI-900, AZ-900, DP-900, AI-102, PL-900</p>
+                </div>
+                <div className="bg-gray-800/50 rounded-lg p-4 border-l-4 border-green-400">
+                  <h4 className="text-green-400 font-semibold mb-1">Metodologias Ágeis</h4>
+                  <p className="text-white text-sm">SCRUM, KANBAN e PDCA</p>
+                </div>
+                <div className="bg-gray-800/50 rounded-lg p-4 border-l-4 border-purple-400">
+                  <h4 className="text-purple-400 font-semibold mb-1">Especialização</h4>
+                  <p className="text-white text-sm">Empresas de 50-500 colaboradores • Atendimento mundial</p>
+                </div>
+              </div>
             </div>
 
-            {/* Coluna do troféu e selo Microsoft */}
-            <div className="flex flex-row items-center justify-center text-center gap-6">
-              <div className="inline-block bg-tech-gradient p-8 rounded-2xl hover:scale-105 transition-transform duration-300 animate-pulse-tech">
-                <span className="text-6xl text-white">🏆</span>
-              </div>
-              <div className="flex flex-col items-start text-left">
-                <h4 className="text-2xl font-bold text-gradient mb-2">
-                  Microsoft Gold Partner
+            {/* Coluna dos badges de certificação - Melhor visualização */}
+            <div className="text-center">
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 hover:border-gray-600 transition-all duration-300">
+                <h4 className="text-2xl font-bold text-white mb-6">
+                  Certificações da Equipe
                 </h4>
-                <p className="text-gray-500">
-                  Certificação de excelência em soluções Microsoft
-                </p>
+                
+                {/* Certificações Microsoft */}
+                <div className="mb-6">
+                  <h5 className="text-blue-400 font-semibold text-sm mb-3">Microsoft Certified</h5>
+                  <div className="grid grid-cols-3 gap-2">
+                    {['AI-900', 'AZ-900', 'DP-900', 'AI-102', 'PL-900'].map((cert) => (
+                      <div key={cert} className="bg-blue-600/20 border border-blue-500/30 rounded-lg p-2 hover:bg-blue-600/30 transition-colors">
+                        <span className="text-blue-300 font-bold text-xs">{cert}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Metodologias */}
+                <div>
+                  <h5 className="text-green-400 font-semibold text-sm mb-3">Metodologias Ágeis</h5>
+                  <div className="grid grid-cols-2 gap-2">
+                    {['SCRUM', 'KANBAN'].map((cert) => (
+                      <div key={cert} className="bg-green-600/20 border border-green-500/30 rounded-lg p-2 hover:bg-green-600/30 transition-colors">
+                        <span className="text-green-300 font-bold text-xs">{cert}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-gray-700">
+                  <p className="text-gray-400 text-xs">
+                    Certificações oficiais e metodologias comprovadas
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Call to Action */}
-        <div className="text-center mt-16">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            Pronto para transformar sua empresa?
-          </h3>
-          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-            Solicite um diagnóstico gratuito e descubra como podemos otimizar
-            sua infraestrutura tecnológica.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="btn-primary text-lg px-8 py-4 animate-gradient hover:scale-105 transition-all duration-300">
-              Solicitar Diagnóstico Gratuito
-            </button>
-            <button className="btn-secondary text-lg px-8 py-4 hover:scale-105 transition-all duration-300">
-              Ver Cases de Sucesso
-            </button>
           </div>
         </div>
       </div>

@@ -2,84 +2,104 @@
 
 import { useState, useEffect } from "react";
 
-export default function TestimonialsSection() {
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+// Função utilitária para preencher textarea de mensagem
+function preencherMensagem(mensagem: string) {
+  setTimeout(() => {
+    const msgField = document.querySelector('textarea[name="mensagem"], textarea#mensagem') as HTMLTextAreaElement | null;
+    if (msgField) msgField.value = mensagem;
+  }, 300);
+}
 
-  const testimonials = [
+export default function TestimonialsSection() {
+  const [activePartner, setActivePartner] = useState(0);
+
+  // Parcerias estratégicas reais
+  const partnerships = [
     {
       id: 1,
-      name: "Maria Santos",
-      position: "Diretora de TI",
-      company: "TechCorp Solutions",
-      avatar: "MS",
-      rating: 5,
-      testimonial:
-        "Excelente equipe, nos ajudou muito na migração para Office 365. Tivemos resultados excelentes na produtividade da nossa equipe. O suporte é sempre rápido e eficiente.",
-      result: "↗️ 40% aumento na produtividade",
+      name: "Buysoft",
+      category: "Soluções Microsoft Integradas",
+      description: "Parceria estratégica para fornecimento de licenças Microsoft e soluções integradas para nossos clientes.",
+      services: ["Licenças Microsoft 365", "Consultoria especializada", "Suporte técnico avançado"],
+      established: "2023"
     },
     {
       id: 2,
-      name: "Carlos Oliveira",
-      position: "CEO",
-      company: "Innovate Solutions",
-      avatar: "CO",
-      rating: 5,
-      testimonial:
-        "A AllTech desde o início nos deu todo suporte necessário na implementação do Azure. Sempre que me perguntam sobre consultoria em tecnologia, eu indico sem hesitar.",
-      result: "💰 35% redução de custos",
+      name: "Dedalus Prime",
+      category: "Consultoria Especializada", 
+      description: "Colaboração em projetos de consultoria complexa e implementação de soluções empresariais Microsoft.",
+      services: ["Consultoria estratégica", "Implementação Azure", "Migração complexa"],
+      established: "2023"
     },
     {
       id: 3,
-      name: "Ana Silva",
-      position: "Gerente de Projetos",
-      company: "DataFlow Systems",
-      avatar: "AS",
-      rating: 5,
-      testimonial:
-        "É uma excelente empresa, com pessoas altamente capacitadas. Gosto do cuidado com o atendimento e do serviço que conseguem prestar. O comprometimento da equipe se solidifica com os ótimos resultados.",
-      result: "⚡ 60% automação de processos",
-    },
-    {
-      id: 4,
-      name: "Roberto Lima",
-      position: "CTO",
-      company: "SmartBusiness Ltd",
-      avatar: "RL",
-      rating: 5,
-      testimonial:
-        "O treinamento em Power Platform foi fundamental para nossa equipe. Agora conseguimos criar soluções internas sem depender de terceiros. ROI fantástico!",
-      result: "🚀 50% mais agilidade",
-    },
+      name: "Dione Solutions",
+      category: "Tecnologia e Inovação",
+      description: "Parceria em desenvolvimento de soluções inovadoras e automação de processos empresariais.",
+      services: ["Power Platform", "Automação", "Soluções customizadas"],
+      established: "2024"
+    }
   ];
 
   const stats = [
     {
       number: "99.9%",
-      label: "Uptime",
-      description: "Disponibilidade garantida",
+      label: "Taxa de Sucesso",
+      description: "Em projetos de migração",
     },
     {
-      number: "150+",
-      label: "Projetos",
-      description: "Entregues com sucesso",
+      number: "2-6",
+      label: "Semanas",
+      description: "Tempo médio de migração",
     },
     {
-      number: "50+",
-      label: "Empresas",
-      description: "Atendidas em todo Brasil",
+      number: "50-500",
+      label: "Colaboradores",
+      description: "Nosso público especializado",
     },
   ];
 
-  // Auto-slide a cada 6 segundos
+  // Cases de sucesso baseados no perfil da empresa
+  const successCases = [
+    {
+      id: 1,
+      sector: "Tecnologia",
+      size: "120 colaboradores",
+      challenge: "Migração do Google Workspace para Microsoft 365",
+      solution: "Migração completa com preservação de 100% dos dados e zero downtime",
+      result: "⚡ Migração concluída em 3 semanas",
+      timeframe: "3 semanas"
+    },
+    {
+      id: 2,
+      sector: "Consultoria",
+      size: "85 colaboradores", 
+      challenge: "Unificação de múltiplos tenants Microsoft 365",
+      solution: "Cross-tenant migration com reestruturação organizacional",
+      result: "🔗 Unificação total com melhoria na colaboração",
+      timeframe: "4 semanas"
+    },
+    {
+      id: 3,
+      sector: "Serviços",
+      size: "200 colaboradores",
+      challenge: "Migração Slack para Microsoft Teams + SharePoint",
+      solution: "Migração completa de comunicação e documentos",
+      result: "📈 40% de melhoria na produtividade",
+      timeframe: "5 semanas"
+    }
+  ];
+
+  // Auto-slide a cada 8 segundos
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 6000);
+      setActivePartner((prev) => (prev + 1) % partnerships.length);
+    }, 8000);
     return () => clearInterval(timer);
-  }, [testimonials.length]);
+  }, [partnerships.length]);
 
-  const goToTestimonial = (index: number) => {
-    setCurrentTestimonial(index);
+  const goToPartner = (index: number) => {
+    setActivePartner(index);
   };
 
   return (
@@ -88,11 +108,11 @@ export default function TestimonialsSection() {
         {/* Título da seção */}
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-            O que nossos <span className="text-gradient">clientes dizem</span>
+            <span className="text-gradient">Parcerias</span> e Cases de Sucesso
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Veja os resultados reais que nossos clientes conquistaram com nossas
-            soluções tecnológicas
+            Conheça nossos parceiros estratégicos e alguns casos reais de migração 
+            bem-sucedida para Microsoft 365
           </p>
         </div>
 
@@ -114,148 +134,167 @@ export default function TestimonialsSection() {
           ))}
         </div>
 
-        {/* Carrossel de depoimentos */}
-        <div className="relative max-w-4xl mx-auto">
-          <div className="bg-gray-50 rounded-2xl p-8 lg:p-12 tech-border-hover tech-shadow overflow-hidden">
-            {/* Aspas decorativas */}
-            <div className="text-6xl text-tech-cyan/30 mb-6 animate-pulse">"</div>
-
-            {/* Conteúdo do depoimento */}
-            <div className="relative min-h-[400px]">
-              {testimonials.map((testimonial, index) => (
-                <div
-                  key={testimonial.id}
-                  className={`transition-all duration-700 transform ${
-                    index === currentTestimonial
-                      ? "opacity-100 translate-x-0"
-                      : "opacity-0 absolute inset-0 translate-x-full"
-                  }`}
-                >
-                  {/* Estrelas */}
-                  <div className="flex justify-center gap-1 mb-6">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <span 
-                        key={i} 
-                        className="text-yellow-400 text-xl animate-pulse"
-                        style={{animationDelay: `${i * 100}ms`}}
-                      >
-                        ★
+        {/* Parcerias Estratégicas */}
+        <div className="mb-16">
+          <h3 className="text-3xl font-bold text-center text-gray-900 mb-8">
+            Nossos <span className="text-gradient">Parceiros Estratégicos</span>
+          </h3>
+          
+          <div className="relative max-w-4xl mx-auto">
+            <div className="bg-gray-50 rounded-2xl p-8 lg:p-12 tech-border-hover tech-shadow overflow-hidden">
+              
+              {/* Conteúdo da parceria */}
+              <div className="relative min-h-[300px]">
+                {partnerships.map((partner, index) => (
+                  <div
+                    key={partner.id}
+                    className={`transition-all duration-700 transform ${
+                      index === activePartner
+                        ? "opacity-100 translate-x-0"
+                        : "opacity-0 absolute inset-0 translate-x-full"
+                    }`}
+                  >
+                    <div className="text-center mb-6">
+                      <h4 className="text-3xl font-bold text-gray-900 mb-2">{partner.name}</h4>
+                      <span className="inline-block bg-tech-gradient text-white px-4 py-1 rounded-full text-sm font-semibold">
+                        {partner.category}
                       </span>
-                    ))}
-                  </div>
+                    </div>
 
-                  {/* Texto do depoimento */}
-                  <blockquote className="text-lg lg:text-xl text-gray-700 leading-relaxed text-center mb-8 italic">
-                    {testimonial.testimonial}
-                  </blockquote>
+                    <p className="text-lg text-gray-700 text-center mb-6 leading-relaxed">
+                      {partner.description}
+                    </p>
 
-                  {/* Resultado destacado */}
-                  <div className="text-center mb-8">
-                    <div className="inline-block bg-tech-gradient text-white px-6 py-2 rounded-full font-semibold hover:scale-105 transition-transform duration-300 animate-pulse-tech">
-                      {testimonial.result}
+                    {/* Serviços da parceria */}
+                    <div className="grid md:grid-cols-3 gap-4 mb-6">
+                      {partner.services.map((service, serviceIndex) => (
+                        <div key={serviceIndex} className="bg-white rounded-lg p-4 text-center shadow-sm">
+                          <span className="text-gray-800 font-medium text-sm">{service}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="text-center">
+                      <span className="text-gray-500 text-sm">
+                        Parceria estabelecida em {partner.established}
+                      </span>
                     </div>
                   </div>
+                ))}
+              </div>
+            </div>
 
-                  {/* Informações do autor */}
-                  <div className="flex items-center justify-center gap-4">
-                    <div className="w-14 h-14 bg-tech-gradient rounded-full flex items-center justify-center text-white font-bold text-lg hover:scale-110 transition-transform duration-300 animate-pulse">
-                      {testimonial.avatar}
-                    </div>
-                    <div className="text-left">
-                      <div className="text-lg font-semibold text-gray-900">
-                        {testimonial.name}
-                      </div>
-                      <div className="text-gray-600">
-                        {testimonial.position}
-                      </div>
-                      <div className="text-tech-cyan text-sm font-medium">
-                        {testimonial.company}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            {/* Controles de navegação */}
+            <div className="flex justify-center gap-4 mt-8">
+              <button
+                onClick={() =>
+                  goToPartner(
+                    (activePartner - 1 + partnerships.length) % partnerships.length
+                  )
+                }
+                className="w-12 h-12 bg-gray-50 hover:bg-tech-gradient rounded-full flex items-center justify-center text-gray-600 hover:text-white transition-all duration-300 tech-border-hover hover:scale-110"
+              >
+                ‹
+              </button>
+              <button
+                onClick={() =>
+                  goToPartner((activePartner + 1) % partnerships.length)
+                }
+                className="w-12 h-12 bg-gray-50 hover:bg-tech-gradient rounded-full flex items-center justify-center text-gray-600 hover:text-white transition-all duration-300 tech-border-hover hover:scale-110"
+              >
+                ›
+              </button>
+            </div>
+
+            {/* Indicadores */}
+            <div className="flex justify-center gap-2 mt-6">
+              {partnerships.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToPartner(index)}
+                  className={`h-3 rounded-full transition-all duration-300 ${
+                    index === activePartner
+                      ? "bg-tech-gradient w-8 animate-pulse"
+                      : "bg-gray-400 hover:bg-tech-gradient w-3"
+                  }`}
+                />
               ))}
             </div>
           </div>
-
-          {/* Controles de navegação */}
-          <div className="flex justify-center gap-4 mt-8">
-            <button
-              onClick={() =>
-                goToTestimonial(
-                  (currentTestimonial - 1 + testimonials.length) %
-                    testimonials.length
-                )
-              }
-              className="w-12 h-12 bg-gray-50 hover:bg-tech-gradient rounded-full flex items-center justify-center text-gray-600 hover:text-white transition-all duration-300 tech-border-hover hover:scale-110"
-            >
-              ‹
-            </button>
-            <button
-              onClick={() =>
-                goToTestimonial((currentTestimonial + 1) % testimonials.length)
-              }
-              className="w-12 h-12 bg-gray-50 hover:bg-tech-gradient rounded-full flex items-center justify-center text-gray-600 hover:text-white transition-all duration-300 tech-border-hover hover:scale-110"
-            >
-              ›
-            </button>
-          </div>
-
-          {/* Indicadores */}
-          <div className="flex justify-center gap-2 mt-6">
-            {testimonials.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToTestimonial(index)}
-                className={`h-3 rounded-full transition-all duration-300 ${
-                  index === currentTestimonial
-                    ? "bg-tech-gradient w-8 animate-pulse"
-                    : "bg-gray-400 hover:bg-tech-gradient w-3"
-                }`}
-              />
-            ))}
-          </div>
         </div>
 
-        {/* Logos de clientes (simulados) */}
-        <div className="mt-16 text-center">
-          <p className="text-gray-700 text-base font-medium mb-8">
-            Empresas que confiam na AllTech Digital
-          </p>
+        {/* Cases de Sucesso */}
+        <div className="mb-16">
+          <h3 className="text-3xl font-bold text-center text-gray-900 mb-8">
+            Cases de <span className="text-gradient">Sucesso</span>
+          </h3>
+          
+          <div className="grid lg:grid-cols-3 gap-8">
+            {successCases.map((case_, index) => (
+              <div key={case_.id} className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                <div className="text-center mb-4">
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">{case_.sector}</h4>
+                  <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                    {case_.size}
+                  </span>
+                </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center">
-            {[
-              "TechCorp",
-              "Innovate",
-              "DataFlow",
-              "SmartBiz",
-              "CloudFirst",
-              "NextGen",
-            ].map((company, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-lg p-4 h-16 flex items-center justify-center tech-border-hover group hover:scale-105 transition-all duration-300 shadow-sm hover:shadow-md"
-              >
-                <span className="text-gray-700 font-bold text-base group-hover:text-tech-cyan transition-all duration-300">
-                  {company}
-                </span>
+                <div className="space-y-4">
+                  <div>
+                    <h5 className="font-semibold text-gray-900 mb-1">🎯 Desafio:</h5>
+                    <p className="text-gray-600 text-sm">{case_.challenge}</p>
+                  </div>
+
+                  <div>
+                    <h5 className="font-semibold text-gray-900 mb-1">💡 Solução:</h5>
+                    <p className="text-gray-600 text-sm">{case_.solution}</p>
+                  </div>
+
+                  <div className="bg-green-50 rounded-lg p-3">
+                    <h5 className="font-semibold text-green-900 mb-1">📊 Resultado:</h5>
+                    <p className="text-green-800 text-sm font-medium">{case_.result}</p>
+                  </div>
+
+                  <div className="text-center">
+                    <span className="inline-block bg-tech-gradient text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      Concluído em {case_.timeframe}
+                    </span>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Call to Action */}
-        <div className="text-center mt-16">
+        <div className="text-center bg-white rounded-2xl p-8 shadow-lg">
           <h3 className="text-2xl font-bold text-gray-900 mb-4">
             Quer ser nosso próximo case de sucesso?
           </h3>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-            Solicite um diagnóstico gratuito e descubra como podemos transformar
-            sua empresa com tecnologia
+            Solicite um diagnóstico gratuito e descubra como podemos migrar 
+            sua empresa para Microsoft 365 com segurança total
           </p>
-          <button className="btn-primary text-lg px-8 py-4 animate-gradient hover:scale-105 transition-all duration-300">
-            Começar Minha Transformação Digital
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button className="btn-primary text-lg px-8 py-4 animate-gradient hover:scale-105 transition-all duration-300"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.location.hash = '#contato';
+                  preencherMensagem('Olá! Gostaria de migrar minha empresa para o Microsoft 365.');
+                }
+              }}
+            >
+              Começar Minha Migração
+            </button>
+            <a 
+              href="https://wa.me/5512992367544" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="btn-secondary text-lg px-8 py-4 hover:scale-105 transition-all duration-300 text-center"
+            >
+              WhatsApp: (12) 99236-7544
+            </a>
+          </div>
         </div>
       </div>
     </section>

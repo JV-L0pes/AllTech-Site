@@ -1,8 +1,16 @@
 // src/components/ContactForm.tsx
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Mail, Phone, MapPin, CheckCircle, AlertCircle, Loader2, User, Building } from "lucide-react";
+
+// Adicionar declaração global para evitar erro TS
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+declare global {
+  interface Window {
+    onRecaptchaSuccess?: (token: string) => void;
+  }
+}
 
 // Domain Types
 interface ContactFormData {
@@ -44,7 +52,7 @@ class ValidationService {
   static validateForm(data: ContactFormData): FormErrors {
     const errors: FormErrors = {};
 
-    // Campos obrigatórios
+    // Nome obrigatório
     if (!data.name.trim()) {
       errors.name = "Nome é obrigatório";
     } else if (data.name.length < 2) {
@@ -55,23 +63,26 @@ class ValidationService {
       errors.name = "Nome não pode conter espaços duplos";
     }
 
+    // Email obrigatório
     if (!data.email.trim()) {
       errors.email = "Email é obrigatório";
     } else if (!this.EMAIL_REGEX.test(data.email)) {
       errors.email = "Email inválido";
     }
 
+    // Mensagem obrigatória
     if (!data.message.trim()) {
       errors.message = "Mensagem é obrigatória";
     } else if (data.message.length < 10) {
       errors.message = "Mensagem deve ter pelo menos 10 caracteres";
     }
 
-    // Campos opcionais com validação
+    // Telefone: só valida se preenchido
     if (data.phone && !this.PHONE_REGEX.test(data.phone)) {
       errors.phone = "Formato: (11) 99999-9999";
     }
 
+    // CNPJ: só valida se preenchido
     if (data.cnpj && !this.CNPJ_REGEX.test(data.cnpj)) {
       errors.cnpj = "Formato: 00.000.000/0000-00";
     }
@@ -140,7 +151,7 @@ function useContactForm() {
     }
   }, [errors]);
 
-  const submitForm = useCallback(async (e: React.FormEvent) => {
+  const submitForm = useCallback(async (e: React.FormEvent, csrfToken: string) => {
     e.preventDefault();
 
     const validationErrors = ValidationService.validateForm(formData);
@@ -157,8 +168,9 @@ function useContactForm() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken, // Adiciona o token CSRF ao header
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData }), // Adiciona o token do reCAPTCHA ao body
       });
 
       const result: ApiResponse = await response.json();
@@ -206,6 +218,7 @@ function useContactForm() {
     apiResponse,
     updateField,
     submitForm,
+    setErrors,
   };
 }
 
@@ -241,15 +254,15 @@ function InputField({
   const inputClass = [
     "w-full px-4 py-3 border rounded-lg transition-all bg-white",
     "focus:ring-2 focus:ring-tech-cyan focus:border-transparent",
-    error ? "border-red-500" : "border-gray-300 hover:border-tech-cyan/50",
+    error ? "border-2 border-red-600 ring-2 ring-red-100" : "border-gray-300 hover:border-tech-cyan/50",
     icon ? "pl-12" : "pl-4",
     inputClassName
   ].join(" ");
 
   return (
-    <div className="relative">
+    <div className="relative mb-2">
       <label htmlFor={id} className={`block text-sm font-semibold text-gray-700 mb-2 ${labelClassName}`}>
-        {label} {required && <span className="text-red-500">*</span>}
+        {label} {required && <span className="text-red-600">*</span>}
       </label>
       <div className="relative">
         {icon && (
@@ -277,10 +290,10 @@ function InputField({
             aria-describedby={error ? `${id}-error` : undefined}
           >
             <option value="">Selecione um serviço</option>
-            <option value="Implementação de Software">Implementação de Software</option>
+            <option value="Migração para Microsoft 365">Migração para Microsoft 365</option>
             <option value="Treinamentos Microsoft">Treinamentos Microsoft</option>
-            <option value="Cloud Service">Cloud Service</option>
-            <option value="Inteligência Artificial">Inteligência Artificial</option>
+            <option value="Consultoria em Cloud">Consultoria em Cloud</option>
+            <option value="Automação de Processos">Automação de Processos</option>
             <option value="Diagnóstico Gratuito">Diagnóstico Gratuito</option>
             <option value="Outros">Outros</option>
           </select>
@@ -298,7 +311,7 @@ function InputField({
         )}
       </div>
       {error && (
-        <p id={`${id}-error`} className="text-red-500 text-xs mt-1" role="alert">
+        <p id={`${id}-error`} className="text-red-600 text-sm mt-2 font-semibold" role="alert">
           {error}
         </p>
       )}
@@ -312,19 +325,19 @@ function ContactInfo() {
     {
       icon: Mail,
       title: "Email",
-      value: "contato@alltechdigital.com",
-      href: "mailto:contato@alltechdigital.com",
+      value: "ulysses.lima@alltechbr.solutions",
+      href: "mailto:ulysses.lima@alltechbr.solutions",
     },
     {
       icon: Phone,
-      title: "Telefone",
-      value: "(11) 9 9999-9999",
-      href: "tel:+5511999999999",
+      title: "WhatsApp",
+      value: "(12) 99236-7544",
+      href: "https://wa.me/5512992367544",
     },
     {
       icon: MapPin,
-      title: "Localização",
-      value: "São Paulo, SP - Brasil",
+      title: "Atendimento",
+      value: "Mundial • Seg-Sex: 9h-18h",
       href: null,
     },
   ];
@@ -332,20 +345,21 @@ function ContactInfo() {
   const benefits = [
     "✅ Resposta em até 24 horas",
     "🆓 Diagnóstico gratuito sem compromisso",
-    "🏆 Parceria Microsoft Gold Partner",
-    "📈 +150 projetos entregues com sucesso",
+    "🏆 Especialistas Microsoft certificados",
+    "🔄 Metodologia PDCA comprovada",
+    "🌍 Atendimento mundial em português",
     "🔒 Dados protegidos e seguros",
   ];
 
   return (
     <div>
       <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-        Vamos <span className="text-gradient">conversar</span>?
+        Pronto para <span className="text-gradient">migrar</span>?
       </h2>
       <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-        Pronto para transformar sua empresa com tecnologia? Entre em contato
-        conosco e descubra como podemos ajudar seu negócio a alcançar o próximo
-        nível.
+        Especialistas em migração para Microsoft 365 com metodologia PDCA. 
+        Entre em contato e descubra como modernizar sua infraestrutura 
+        com segurança total e zero downtime.
       </p>
 
       {/* Contact Details */}
@@ -371,7 +385,7 @@ function ContactInfo() {
           return (
             <div key={index}>
               {item.href ? (
-                <a href={item.href} className="block">
+                <a href={item.href} className="block" target={item.href.startsWith('https://wa.me') ? '_blank' : undefined} rel={item.href.startsWith('https://wa.me') ? 'noopener noreferrer' : undefined}>
                   {content}
                 </a>
               ) : (
@@ -449,7 +463,7 @@ function StatusMessage({ status, apiResponse }: {
               Erro ao enviar mensagem
             </h4>
             <p className="text-red-700 text-sm">
-              Tente novamente ou use nosso email diretamente: contato@alltechdigital.com
+              Tente novamente ou use nosso email diretamente: ulysses.lima@alltechbr.solutions
             </p>
           </div>
         </div>
@@ -462,7 +476,35 @@ function StatusMessage({ status, apiResponse }: {
 
 // Main Component
 export default function ContactForm() {
-  const { formData, errors, status, apiResponse, updateField, submitForm } = useContactForm();
+  const { formData, errors, status, apiResponse, updateField, submitForm, setErrors } = useContactForm();
+  const [csrfToken, setCsrfToken] = useState("");
+  const [lgpdConsent, setLgpdConsent] = useState(false);
+  const [lgpdError, setLgpdError] = useState("");
+
+  useEffect(() => {
+    setCsrfToken(
+      Math.random().toString(36).substring(2) + Date.now().toString(36)
+    );
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLgpdError("");
+    const validationErrors = ValidationService.validateForm(formData);
+    let hasError = false;
+    if (!lgpdConsent) {
+      setLgpdError("É necessário aceitar o consentimento de dados (LGPD)");
+      hasError = true;
+    }
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      hasError = true;
+    } else {
+      setErrors({});
+    }
+    if (hasError) return;
+    submitForm(e, csrfToken);
+  };
 
   const estadosBrasileiros = [
     { code: 'AC', name: 'Acre' },
@@ -503,7 +545,7 @@ export default function ContactForm() {
           <div className="bg-gray-50 rounded-2xl p-8 tech-border-hover tech-shadow">
             <StatusMessage status={status} apiResponse={apiResponse} />
 
-            <form onSubmit={submitForm} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Informações Pessoais */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -546,6 +588,7 @@ export default function ContactForm() {
                     placeholder="(11) 9 9999-9999"
                     icon={<Phone className="w-5 h-5 text-tech-cyan" />}
                     maxLength={15}
+                    required
                   />
                 </div>
               </div>
@@ -649,7 +692,7 @@ export default function ContactForm() {
                   value={formData.message}
                   onChange={(value) => updateField("message", value)}
                   error={errors.message}
-                  placeholder="Conte-nos sobre seu projeto, necessidades ou dúvidas. Quanto mais detalhes, melhor poderemos ajudá-lo..."
+                  placeholder="Conte-nos sobre seu projeto de migração, número de usuários, sistemas atuais (Google Workspace, Slack, etc.) e urgência do projeto..."
                   required
                   maxLength={1000}
                 />
@@ -657,6 +700,24 @@ export default function ContactForm() {
                   {formData.message.length}/1000 caracteres
                 </div>
               </div>
+
+              {/* Checkbox LGPD obrigatório */}
+              <div className="flex items-start gap-2 pt-2">
+                <input
+                  id="lgpdConsent"
+                  type="checkbox"
+                  checked={lgpdConsent}
+                  onChange={e => setLgpdConsent(e.target.checked)}
+                  required
+                  className="mt-1"
+                />
+                <label htmlFor="lgpdConsent" className="text-sm text-gray-700">
+                  Concordo com a coleta e uso dos meus dados conforme a <a href="/politica-de-privacidade" target="_blank" rel="noopener noreferrer" className="underline text-tech-cyan">Política de Privacidade</a>.
+                </label>
+              </div>
+              {lgpdError && (
+                <p className="text-red-600 text-sm mt-2 font-semibold" role="alert">{lgpdError}</p>
+              )}
 
               {/* Botão de Envio */}
               <div className="pt-4">
@@ -699,12 +760,13 @@ export default function ContactForm() {
                   💡 Dica para uma resposta mais rápida
                 </h4>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Mencione qual tecnologia Microsoft você já usa</li>
-                  <li>• Descreva seu principal desafio tecnológico atual</li>
-                  <li>• Indique se há urgência no projeto</li>
-                  <li>• Inclua informações sobre orçamento (se possível)</li>
+                  <li>• Mencione se usa Google Workspace, Slack ou outro tenant Microsoft</li>
+                  <li>• Descreva o número aproximado de usuários a migrar</li>
+                  <li>• Indique se há urgência no projeto de migração</li>
+                  <li>• Mencione se já tentou migrar anteriormente</li>
                 </ul>
               </div>
+              <input type="hidden" name="csrfToken" value={csrfToken} />
             </form>
           </div>
         </div>

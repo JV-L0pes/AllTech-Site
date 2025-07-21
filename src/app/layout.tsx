@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import PoliticaDePrivacidade from "@/app/politica-de-privacidade/page";
+import TermosDeUso from "@/app/termos-de-uso/page";
 
 const inter = Inter({ subsets: ["latin"] });
 

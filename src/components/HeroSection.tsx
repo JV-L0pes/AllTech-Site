@@ -328,12 +328,37 @@ const SlideComponent = ({ slide, isActive, isNext, progress, direction, isTransi
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="btn-primary text-lg px-8 py-4 w-full sm:w-auto hover:scale-105 transition-all duration-300">
-                {slide.ctaPrimary || "Solicitar Diagnóstico Gratuito"}
-              </button>
-              <button className="bg-white/10 backdrop-blur-sm border-2 border-white/20 text-white hover:bg-white hover:text-tech-deep font-semibold py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 w-full sm:w-auto">
-                {slide.ctaSecondary || "Ver Cases de Sucesso"}
-              </button>
+              {slide.ctaPrimary === "Diagnóstico Gratuito" ? (
+                <button
+                  className="btn-primary text-lg px-8 py-4 w-full sm:w-auto hover:scale-105 transition-all duration-300"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      window.location.hash = '#contato';
+                      preencherMensagem('Olá! Gostaria de solicitar um diagnóstico gratuito da minha infraestrutura.');
+                    }
+                  }}
+                >
+                  {slide.ctaPrimary}
+                </button>
+              ) : (
+                <button className="btn-primary text-lg px-8 py-4 w-full sm:w-auto hover:scale-105 transition-all duration-300">
+                  {slide.ctaPrimary}
+                </button>
+              )}
+              {slide.ctaSecondary === "Fale com um especialista" && slide.id === 1 ? (
+                <a
+                  href="https://wa.me/5512992367544?text=Ol%C3%A1!%20Gostaria%20de%20falar%20com%20um%20especialista%20sobre%20migra%C3%A7%C3%A3o%20para%20Microsoft%20365."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/10 backdrop-blur-sm border-2 border-white/20 text-white hover:bg-white hover:text-tech-deep font-semibold py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 w-full sm:w-auto text-center"
+                >
+                  Fale com um especialista
+                </a>
+              ) : (
+                <button className="bg-white/10 backdrop-blur-sm border-2 border-white/20 text-white hover:bg-white hover:text-tech-deep font-semibold py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 w-full sm:w-auto">
+                  {slide.ctaSecondary || "Ver Cases de Sucesso"}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -373,6 +398,14 @@ const ProgressBar = ({ currentSlide, totalSlides, isTransitioning, progress }: {
   );
 };
 
+// Função utilitária para preencher textarea de mensagem
+function preencherMensagem(mensagem: string) {
+  setTimeout(() => {
+    const msgField = document.querySelector('textarea[name="mensagem"], textarea#mensagem') as HTMLTextAreaElement | null;
+    if (msgField) msgField.value = mensagem;
+  }, 300);
+}
+
 export default function HeroSection() {
   const isVisible = useVisibilityObserver('inicio');
   const { isLowPerformance } = usePerformanceOptimizations();
@@ -380,29 +413,29 @@ export default function HeroSection() {
   const slides: readonly Slide[] = useMemo(() => [
     {
       id: 1,
-      title: "Quer investir em tecnologia de forma inteligente?",
-      subtitle: "Transforme sua empresa com soluções Microsoft que realmente funcionam",
-      description: "Implementação de software, treinamentos especializados e migração para cloud com resultados garantidos.",
+      title: "Precisa migrar para Microsoft 365?",
+      subtitle: "Modernize sua infraestrutura com segurança total e zero downtime",
+      description: "Migração completa do Google Workspace, Slack ou entre tenants Microsoft. Preservamos 100% dos seus dados com metodologia PDCA comprovada.",
       backgroundClass: "bg-gradient-to-br from-tech-cyan via-tech-electric to-tech-deep",
       ctaPrimary: "Diagnóstico Gratuito",
-      ctaSecondary: "Ver Soluções",
+      ctaSecondary: "Fale com um especialista",
     },
     {
       id: 2,
-      title: "Parceiros oficiais Microsoft",
-      subtitle: "Certificação Gold Partner para sua tranquilidade",
-      description: "Acesso às mais recentes tecnologias e suporte técnico especializado direto da Microsoft.",
+      title: "Especialistas Microsoft Certificados",
+      subtitle: "Equipe com certificações AI-900, AZ-900, DP-900 e mais",
+      description: "Nossa equipe possui certificações oficiais Microsoft e experiência real em projetos de migração para empresas de 50-500 colaboradores.",
       backgroundClass: "bg-gradient-to-br from-tech-deep via-tech-indigo to-tech-violet",
-      ctaPrimary: "Conhecer Parceria",
-      ctaSecondary: "Certificações",
+      ctaPrimary: "Conhecer Equipe",
+      ctaSecondary: "Ver Certificações",
     },
     {
       id: 3,
-      title: "Resultados mensuráveis e crescimento sustentável",
-      subtitle: "Não vendemos ferramentas, oferecemos parceria",
-      description: "Análise completa, implementação personalizada e acompanhamento contínuo para o sucesso do seu negócio.",
+      title: "Resultados em 2-6 semanas",
+      subtitle: "Metodologia PDCA • Entrega com empatia e responsabilidade",
+      description: "Plan, Do, Check, Act - Nossa metodologia garante migração segura, preservação total dos dados e suporte completo durante todo o processo.",
       backgroundClass: "bg-gradient-to-br from-tech-indigo via-tech-violet to-tech-electric",
-      ctaPrimary: "Ver Resultados",
+      ctaPrimary: "Ver Metodologia",
       ctaSecondary: "Cases de Sucesso",
     },
   ], []);

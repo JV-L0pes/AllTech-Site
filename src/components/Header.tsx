@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Instagram, Linkedin } from "lucide-react";
+import { Instagram, Linkedin, MessageCircle } from "lucide-react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,7 +24,7 @@ export default function Header() {
         : 'bg-white/95 border-gray-200 shadow-lg'
     }`}>
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center py-1 min-h-[68px]"> {/* Ajuste para 68px */}
+        <div className="flex justify-between items-center py-1 min-h-[68px]">
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex items-center gap-3">
@@ -87,19 +87,41 @@ export default function Header() {
             <a
               href="https://www.instagram.com/alltech.digital/"
               title="Instagram"
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group hover:scale-110"
-              target="_blank" rel="noopener noreferrer"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 transition-all duration-300 group hover:scale-110"
+              target="_blank" 
+              rel="noopener noreferrer"
             >
               <Instagram className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
             </a>
             <a
-              href="#"
+              href="https://www.linkedin.com/company/alltechdigital/"
               title="LinkedIn"
               className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group hover:scale-110"
+              target="_blank" 
+              rel="noopener noreferrer"
             >
               <Linkedin className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
             </a>
-            <button className="btn-primary animate-gradient ml-2 hover:scale-105 transition-transform duration-300 tech-glow">
+            <a
+              href="https://wa.me/5512992367544"
+              title="WhatsApp: (12) 99236-7544"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-green-500 transition-all duration-300 group hover:scale-110"
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              <MessageCircle className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
+            </a>
+            <button className="btn-primary animate-gradient ml-2 hover:scale-105 transition-transform duration-300 tech-glow"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.location.hash = '#contato';
+                  setTimeout(() => {
+                    const msgField = document.querySelector('textarea[name="mensagem"], textarea#mensagem') as HTMLTextAreaElement | null;
+                    if (msgField) msgField.value = 'Olá! Gostaria de solicitar um diagnóstico gratuito da minha infraestrutura.';
+                  }, 300);
+                }
+              }}
+            >
               Diagnóstico Gratuito
             </button>
           </div>
@@ -145,24 +167,62 @@ export default function Header() {
               >
                 Contato
               </a>
+              
+              {/* Contatos mobile */}
               <div className="flex gap-3 mt-2 mb-2 px-4">
                 <a
                   href="https://www.instagram.com/alltech.digital/"
                   title="Instagram"
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group"
-                  target="_blank" rel="noopener noreferrer"
+                  className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 transition-all duration-300 group"
+                  target="_blank" 
+                  rel="noopener noreferrer"
                 >
                   <Instagram className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
                 </a>
                 <a
-                  href="#"
+                  href="https://www.linkedin.com/company/alltechdigital/"
                   title="LinkedIn"
                   className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-tech-gradient transition-all duration-300 group"
+                  target="_blank" 
+                  rel="noopener noreferrer"
                 >
                   <Linkedin className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
                 </a>
+                <a
+                  href="https://wa.me/5512992367544"
+                  title="WhatsApp: (12) 99236-7544"
+                  className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-green-500 transition-all duration-300 group"
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <MessageCircle className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
+                </a>
               </div>
-              <button className="btn-primary w-full animate-gradient tech-glow">
+
+              {/* Informações de contato mobile */}
+              <div className="px-4 py-2 bg-gray-50 rounded-lg mx-4">
+                <p className="text-xs text-gray-600 mb-1">
+                  📱 WhatsApp: (12) 99236-7544
+                </p>
+                <p className="text-xs text-gray-600 mb-1">
+                  📧 ulysses.lima@alltechbr.solutions
+                </p>
+                <p className="text-xs text-gray-600">
+                  🕒 Seg-Sex: 9h às 18h
+                </p>
+              </div>
+
+              <button className="btn-primary w-full animate-gradient tech-glow"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.location.hash = '#contato';
+                    setTimeout(() => {
+                      const msgField = document.querySelector('textarea[name="mensagem"], textarea#mensagem') as HTMLTextAreaElement | null;
+                      if (msgField) msgField.value = 'Olá! Gostaria de solicitar um diagnóstico gratuito da minha infraestrutura.';
+                    }, 300);
+                  }
+                }}
+              >
                 Diagnóstico Gratuito
               </button>
             </nav>

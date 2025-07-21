@@ -354,6 +354,39 @@ async function handlePOST(request: NextRequest) {
   try {
     console.log('📨 Recebendo solicitação de contato...');
     
+    // Proteção CORS
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://localhost:3000',
+      'https://localhost:3001',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:3001',
+      'https://127.0.0.1:3000',
+      'https://127.0.0.1:3001',
+      // Permitir domínios ngrok para desenvolvimento
+      ...((request.headers.get('origin') || '').includes('ngrok') ? [request.headers.get('origin')] : [])
+    ];
+    const origin = request.headers.get('origin');
+    if (origin && !allowedOrigins.includes(origin)) {
+      return new Response('CORS Forbidden', {
+        status: 403,
+        headers: {
+          'Content-Type': 'text/plain',
+          'Access-Control-Allow-Origin': 'null',
+        }
+      });
+    }
+    
+    // Validação CSRF
+    const csrfToken = request.headers.get('x-csrf-token');
+    if (!csrfToken || typeof csrfToken !== 'string' || csrfToken.length < 10) {
+      return NextResponse.json({
+        success: false,
+        message: 'Falha de segurança: token CSRF ausente ou inválido.'
+      }, { status: 403 });
+    }
+    
     const body = await request.json();
     
     // Validar dados de entrada
@@ -382,7 +415,8 @@ async function handlePOST(request: NextRequest) {
         'Content-Type': 'application/json',
         'X-Content-Type-Options': 'nosniff',
         'X-Frame-Options': 'DENY',
-        'X-XSS-Protection': '1; mode=block'
+        'X-XSS-Protection': '1; mode=block',
+        ...(origin ? { 'Access-Control-Allow-Origin': origin } : {})
       }
     });
     

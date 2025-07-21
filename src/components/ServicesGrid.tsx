@@ -33,186 +33,186 @@ export default function ServicesGrid() {
   const [activeService, setActiveService] = useState(0);
   const [expandedService, setExpandedService] = useState<number | null>(null);
 
-  // Domain Service - Service Data Management com detalhes personalizados
+  // Domain Service - Service Data Management com serviços reais do cliente
   const servicesData = [
     {
       id: 1,
-      icon: "💻",
-      title: "Implementação de Software",
-      subtitle: "Sistemas personalizados para sua empresa",
+      icon: "🔄",
+      title: "Migração para Microsoft 365",
+      subtitle: "Modernize sua infraestrutura de TI com segurança total",
       description:
-        "Desenvolvemos e implementamos soluções de software sob medida, integrando perfeitamente com sua infraestrutura existente. Nossa abordagem garante máxima eficiência e produtividade.",
+        "Realizamos projetos completos de migração de ambientes e dados, garantindo continuidade operacional, segurança e preservação da integridade das informações durante todo o processo.",
       features: [
-        "Análise de requisitos detalhada",
-        "Desenvolvimento ágil e iterativo",
-        "Integração com sistemas legados",
-        "Treinamento da equipe",
-        "Suporte pós-implementação",
+        "Google Workspace para Microsoft 365",
+        "Migração entre tenants Microsoft 365",
+        "Slack para Microsoft Teams",
+        "SharePoint Online com estruturação completa",
+        "Automação e monitoramento em tempo real",
       ],
-      color: "from-tech-cyan to-tech-green",
+      color: "from-tech-cyan to-tech-cyan",
       details: {
-        id: "implementacao-software",
-        overview: "Transformamos suas necessidades específicas de negócio em soluções de software robustas e escaláveis. Utilizamos metodologias ágeis modernas como Scrum e Kanban, garantindo entregas incrementais e feedback contínuo durante todo o processo de desenvolvimento.",
-        duration: "3-8 meses (conforme complexidade)",
-        targetAudience: "Empresas que precisam de sistemas ERP, CRM, gestão de estoque, automação de processos ou integração de sistemas",
-        prerequisites: "Mapeamento dos processos atuais, definição de requisitos funcionais e aprovação de orçamento",
+        id: "migracao-microsoft365",
+        overview: "Especializamos-nos em projetos completos de migração de ambientes e dados, com foco em empresas que desejam modernizar sua infraestrutura de TI. Nossa metodologia PDCA garante planejamento detalhado, execução controlada e resultados mensuráveis.",
+        duration: "2-6 semanas (conforme complexidade do ambiente)",
+        targetAudience: "Empresas entre 50-500 colaboradores que utilizam Google Workspace, tenants Microsoft separados ou plataformas como Slack",
+        prerequisites: "Levantamento do ambiente atual, definição de estratégia de migração e aprovação de orçamento. Inclui avaliação gratuita do ambiente e planejamento detalhado.",
         features: [
-          { id: "req-analysis", name: "Levantamento de Requisitos", description: "Análise detalhada dos processos de negócio e necessidades específicas da empresa" },
-          { id: "agile-dev", name: "Desenvolvimento Ágil", description: "Metodologia Scrum com sprints de 2 semanas e demonstrações regulares" },
-          { id: "integration", name: "Integração Completa", description: "APIs REST/SOAP para integração com ERPs, bancos de dados e sistemas terceiros" },
-          { id: "testing", name: "Testes Rigorosos", description: "Testes unitários, integração e homologação em ambiente controlado" },
-          { id: "deployment", name: "Deploy Profissional", description: "Migração de dados, rollback automático e deploy sem downtime" }
+          { id: "google-to-m365", name: "Google Workspace → Microsoft 365", description: "Migração completa de e-mails, contatos, calendários, Google Drive para OneDrive/SharePoint" },
+          { id: "cross-tenant", name: "Cross-tenant Microsoft 365", description: "Migração nativa entre tenants com configuração de endpoints e trust" },
+          { id: "slack-teams", name: "Slack → Microsoft Teams", description: "Migração de canais, mensagens históricas e estruturação de equipes" },
+          { id: "sharepoint-migration", name: "Migração SharePoint Online", description: "Estruturação documental, recriação de hierarquias e permissões" },
+          { id: "automation", name: "Automação Completa", description: "Scripts personalizados com logs detalhados e monitoramento em tempo real" }
         ],
         benefits: [
-          { id: "efficiency", title: "Eficiência Operacional", description: "Redução de 60-80% no tempo de processos manuais", icon: "⚡" },
-          { id: "integration", title: "Integração Total", description: "Unificação de dados e eliminação de retrabalho", icon: "🔗" },
-          { id: "scalability", title: "Escalabilidade", description: "Arquitetura preparada para crescimento da empresa", icon: "📈" },
-          { id: "roi", title: "ROI Comprovado", description: "Retorno do investimento em 12-18 meses", icon: "💰" }
+          { id: "modernization", title: "Modernização Completa", description: "Consolidação de plataformas e aumento da segurança", icon: "🚀" },
+          { id: "data-preservation", title: "Preservação Total", description: "100% dos dados, estruturas e permissões preservados", icon: "🛡️" },
+          { id: "cost-reduction", title: "Redução de Custos", description: "Eliminação de múltiplas plataformas e licenças", icon: "💰" },
+          { id: "business-continuity", title: "Continuidade Operacional", description: "Migração com interrupção mínima dos negócios", icon: "⚡" }
         ],
         deliverables: [
-          "Sistema completo desenvolvido em tecnologias modernas (React, Node.js, .NET)",
-          "Documentação técnica completa e manual do usuário ilustrado",
-          "Código-fonte organizado com comentários e padrões de desenvolvimento",
-          "Scripts de banco de dados e procedures otimizadas",
-          "Plano de backup automatizado e disaster recovery",
-          "3 meses de suporte técnico gratuito incluído"
+          "Ambiente Microsoft 365 completamente configurado e funcional",
+          "Migração completa de todos os dados com validação de integridade",
+          "Documentação técnica detalhada do processo e configurações",
+          "Treinamento para usuários finais no novo ambiente",
+          "Suporte pós-migração por período determinado",
+          "Relatório final com métricas e validações realizadas"
         ],
-        methodology: "Seguimos metodologia ágil com Design Thinking para entender profundamente as necessidades do usuário. Utilizamos arquitetura em microsserviços para garantir flexibilidade e escalabilidade. Cada sprint inclui: planning, desenvolvimento, testes automatizados, code review e demonstração para o cliente."
+        methodology: "Utilizamos metodologia PDCA (Plan-Do-Check-Act) com abordagem ágil: 1) PLAN - Análise detalhada do ambiente e planejamento da migração, 2) DO - Execução por lotes para reduzir impacto, 3) CHECK - Validação contínua e logs detalhados, 4) ACT - Ajustes e otimizações baseados nos resultados."
       }
     },
     {
       id: 2,
       icon: "🎓",
       title: "Treinamentos Microsoft",
-      subtitle: "Capacitação especializada e certificações",
+      subtitle: "Capacitação especializada com certificações oficiais",
       description:
-        "Oferecemos treinamentos completos em tecnologias Microsoft, desde Office 365 até Azure. Nossa equipe certificada garante aprendizado eficaz e aplicação prática imediata.",
+        "Treinamentos práticos ministrados por instrutores certificados MCT, focados na aplicação real das tecnologias Microsoft no dia a dia da sua empresa.",
       features: [
-        "Office 365 e Microsoft Teams",
-        "Azure Cloud Computing",
-        "Power Platform (Power BI, Power Apps)",
-        "Certificações oficiais Microsoft",
-        "Metodologia hands-on",
+        "Office 365 e Microsoft Teams avançado",
+        "Azure Cloud Computing fundamentals",
+        "Power Platform (BI, Apps, Automate)",
+        "Preparação para certificações oficiais",
+        "Metodologia hands-on personalizada",
       ],
-      color: "from-tech-cyan to-tech-green",
+      color: "from-tech-cyan to-tech-cyan",
       details: {
         id: "treinamentos-microsoft",
-        overview: "Nossos treinamentos Microsoft combinam teoria e prática intensiva, ministrados por instrutores com certificações MCT (Microsoft Certified Trainer) e experiência real em projetos corporativos. Utilizamos cenários reais da sua empresa para garantir aplicabilidade imediata.",
-        duration: "1-5 dias por módulo (flexível conforme necessidade)",
-        targetAudience: "Profissionais de TI, desenvolvedores, analistas de BI, gestores e usuários finais que trabalham com tecnologias Microsoft",
-        prerequisites: "Conhecimentos básicos em informática, acesso às plataformas Microsoft e motivação para aprender",
+        overview: "Oferecemos treinamentos especializados em tecnologias Microsoft, ministrados por instrutores com certificações MCT e experiência prática em projetos corporativos. Nossa abordagem combina teoria essencial com prática intensiva usando cenários reais da sua empresa.",
+        duration: "1-5 dias por módulo (flexível conforme necessidade da empresa)",
+        targetAudience: "Profissionais de TI, analistas, gestores e usuários finais que trabalham com tecnologias Microsoft",
+        prerequisites: "Conhecimentos básicos em informática, acesso às plataformas Microsoft e disponibilidade para dedicação integral",
         features: [
-          { id: "office365", name: "Office 365 Avançado", description: "SharePoint, Teams, OneDrive, Planner e automações com Power Automate" },
-          { id: "azure-fundamentals", name: "Azure Cloud", description: "Máquinas virtuais, storage, redes, Active Directory e segurança" },
-          { id: "power-platform", name: "Power Platform Completo", description: "Power BI para dashboards, Power Apps para aplicativos e Power Automate para workflows" },
-          { id: "teams-advanced", name: "Teams Empresarial", description: "Configurações avançadas, integrações e governança corporativa" },
-          { id: "certification", name: "Preparação para Certificações", description: "AZ-900, PL-900, MS-900 e outras certificações fundamentais Microsoft" }
+          { id: "office365-advanced", name: "Office 365 Avançado", description: "SharePoint, Teams, OneDrive, Planner e automações com Power Automate" },
+          { id: "azure-fundamentals", name: "Azure Fundamentals", description: "VMs, storage, redes, Active Directory e conceitos de segurança na nuvem" },
+          { id: "power-platform", name: "Power Platform Completo", description: "Power BI para dashboards, Power Apps para aplicações e Power Automate para workflows" },
+          { id: "teams-enterprise", name: "Teams Empresarial", description: "Configurações avançadas, integrações corporativas e governança" },
+          { id: "certification-prep", name: "Prep. Certificações", description: "AZ-900, AI-900, PL-900, DP-900 e outras fundamentals Microsoft" }
         ],
         benefits: [
-          { id: "productivity", title: "Produtividade Imediata", description: "Aplicação prática dos conhecimentos no primeiro dia", icon: "🚀" },
-          { id: "certification", title: "Certificação Oficial", description: "Vouchers para exames Microsoft inclusos", icon: "🏆" },
-          { id: "support", title: "Suporte Continuado", description: "30 dias de mentoria pós-treinamento via Teams", icon: "🤝" },
-          { id: "materials", title: "Material Premium", description: "Apostilas atualizadas e acesso a laboratórios virtuais", icon: "📚" }
+          { id: "immediate-application", title: "Aplicação Imediata", description: "Conhecimentos aplicáveis no primeiro dia de trabalho", icon: "⚡" },
+          { id: "official-certification", title: "Certificação Oficial", description: "Vouchers para exames Microsoft inclusos", icon: "🏆" },
+          { id: "ongoing-support", title: "Suporte Continuado", description: "30 dias de mentoria pós-treinamento", icon: "🤝" },
+          { id: "premium-materials", title: "Material Premium", description: "Apostilas atualizadas e laboratórios virtuais", icon: "📚" }
         ],
         deliverables: [
-          "Certificado de participação AllTech Digital reconhecido pelo mercado",
-          "Material didático atualizado com as últimas versões Microsoft",
-          "Acesso a ambiente de laboratório por 60 dias para prática",
+          "Certificado AllTech Digital reconhecido pelo mercado",
+          "Material didático atualizado com últimas versões Microsoft",
+          "Acesso a ambiente de laboratório por 60 dias",
           "Voucher oficial Microsoft para exame de certificação",
-          "Sessões de mentoria individual por 30 dias",
-          "Acesso vitalício a atualizações do material do curso"
+          "30 dias de mentoria individual pós-treinamento",
+          "Acesso vitalício a atualizações do material"
         ],
-        methodology: "Metodologia 70-20-10: 70% prática hands-on, 20% discussões e casos reais, 10% teoria. Cada participante trabalha em seu próprio ambiente ou sandbox dedicado. Utilizamos técnicas de microlearning com sessões de 2-3 horas para maximizar retenção do conhecimento."
+        methodology: "Metodologia 70-20-10: 70% prática hands-on em ambiente real, 20% discussões de casos práticos da empresa, 10% teoria essencial. Utilizamos microlearning com sessões de 2-3 horas para maximizar retenção e aplicação do conhecimento."
       }
     },
     {
       id: 3,
       icon: "☁️",
-      title: "Cloud Service",
-      subtitle: "Migração e otimização na nuvem",
+      title: "Consultoria em Cloud",
+      subtitle: "Estratégia e otimização para ambientes em nuvem",
       description:
-        "Facilitamos sua jornada para a nuvem com estratégias personalizadas, garantindo segurança, escalabilidade e redução de custos operacionais significativos.",
+        "Consultoria especializada para planejamento, implementação e otimização de infraestruturas cloud, com foco em Microsoft Azure e melhores práticas do mercado.",
       features: [
-        "Planejamento de migração",
-        "Otimização de custos",
-        "Backup e disaster recovery",
-        "Monitoramento 24/7",
-        "Compliance e segurança",
+        "Análise de infraestrutura atual",
+        "Planejamento de arquitetura cloud",
+        "Otimização de custos operacionais",
+        "Implementação de boas práticas",
+        "Monitoramento e governança",
       ],
-      color: "from-tech-cyan to-tech-green",
+      color: "from-tech-cyan to-tech-cyan",
       details: {
-        id: "cloud-service",
-        overview: "Executamos migrações completas para Microsoft Azure seguindo o Cloud Adoption Framework (CAF). Nossa abordagem estratégica garante migração segura, otimização de custos e compliance com LGPD/GDPR, resultando em infraestrutura moderna e resiliente.",
-        duration: "4-12 meses (dependendo da complexidade da infraestrutura)",
-        targetAudience: "Empresas com infraestrutura on-premises que desejam modernizar, reduzir custos ou melhorar escalabilidade",
-        prerequisites: "Inventário da infraestrutura atual, definição de objetivos de negócio e orçamento aprovado para migração",
+        id: "consultoria-cloud",
+        overview: "Oferecemos consultoria estratégica para empresas que desejam migrar para a nuvem ou otimizar seus ambientes cloud existentes. Nossa expertise em Microsoft Azure e metodologias ágeis garantem implementações eficientes e sustentáveis.",
+        duration: "2-12 semanas (dependendo da complexidade da infraestrutura)",
+        targetAudience: "Empresas com infraestrutura on-premises ou ambientes cloud que precisam de otimização",
+        prerequisites: "Inventário da infraestrutura atual, objetivos de negócio definidos e orçamento aprovado",
         features: [
-          { id: "assessment", name: "Assessment Detalhado", description: "Azure Migrate para análise completa de workloads, dependências e custos" },
-          { id: "migration-strategy", name: "Estratégia de Migração", description: "Lift-and-shift, re-platforming ou re-architecting conforme necessidade" },
-          { id: "security", name: "Segurança Avançada", description: "Azure Security Center, Key Vault, identity management e compliance LGPD" },
-          { id: "monitoring", name: "Monitoramento Proativo", description: "Azure Monitor, alertas automatizados e dashboards executivos" },
-          { id: "cost-optimization", name: "Otimização Contínua", description: "Azure Cost Management, reserved instances e auto-scaling" }
+          { id: "infrastructure-assessment", name: "Assessment Completo", description: "Análise detalhada da infraestrutura atual e identificação de oportunidades" },
+          { id: "cloud-strategy", name: "Estratégia Cloud", description: "Roadmap personalizado com arquitetura recomendada e cronograma" },
+          { id: "cost-optimization", name: "Otimização de Custos", description: "Análise de gastos e implementação de políticas de economia" },
+          { id: "security-compliance", name: "Segurança e Compliance", description: "Implementação de controles de segurança e adequação regulatória" },
+          { id: "monitoring-governance", name: "Governança Cloud", description: "Políticas de uso, monitoramento e controle de recursos" }
         ],
         benefits: [
-          { id: "cost-reduction", title: "Redução de Custos", description: "25-40% de economia em infraestrutura no primeiro ano", icon: "💰" },
-          { id: "scalability", title: "Escalabilidade Infinita", description: "Recursos sob demanda sem investimento em hardware", icon: "📊" },
-          { id: "security", title: "Segurança Enterprise", description: "Proteção multicamadas com certificações internacionais", icon: "🔒" },
-          { id: "availability", title: "Alta Disponibilidade", description: "SLA 99.95% com disaster recovery automatizado", icon: "🌐" }
+          { id: "strategic-planning", title: "Planejamento Estratégico", description: "Roadmap claro para transformação digital", icon: "🎯" },
+          { id: "cost-efficiency", title: "Eficiência de Custos", description: "20-40% de redução em gastos com infraestrutura", icon: "💰" },
+          { id: "scalability", title: "Escalabilidade", description: "Arquitetura preparada para crescimento do negócio", icon: "📈" },
+          { id: "risk-mitigation", title: "Mitigação de Riscos", description: "Implementação de controles e boas práticas", icon: "🛡️" }
         ],
         deliverables: [
-          "Infraestrutura cloud completamente configurada e otimizada no Azure",
-          "Documentação detalhada de arquitetura e procedimentos operacionais",
-          "Plano de disaster recovery testado e validado",
-          "Dashboard executivo para monitoramento de custos e performance",
-          "Políticas de backup automatizadas com retenção configurável",
-          "Treinamento operacional para equipe técnica interna"
+          "Relatório detalhado de assessment da infraestrutura atual",
+          "Roadmap estratégico para implementação cloud",
+          "Documentação de arquitetura recomendada",
+          "Políticas de governança e controle de custos",
+          "Plano de migração com cronograma detalhado",
+          "Treinamento para equipe técnica interna"
         ],
-        methodology: "Seguimos rigorosamente o Microsoft Cloud Adoption Framework com 6 fases: Strategy (definição de objetivos), Plan (roadmap detalhado), Ready (preparação do ambiente), Adopt (migração gradual), Govern (governança e políticas) e Manage (operação otimizada). Cada fase inclui checkpoints e validações."
+        methodology: "Aplicamos metodologia PDCA integrada com Cloud Adoption Framework (CAF) da Microsoft: PLAN (estratégia e assessment), DO (implementação gradual), CHECK (monitoramento e validação), ACT (otimização contínua). Cada fase inclui validações e aprovações do cliente."
       }
     },
     {
       id: 4,
       icon: "🤖",
-      title: "Inteligência Artificial",
-      subtitle: "Automação e análise inteligente",
+      title: "Automação de Processos",
+      subtitle: "Power Platform e automação inteligente",
       description:
-        "Implementamos soluções de IA para automatizar processos, analisar dados e gerar insights valiosos que impulsionam a tomada de decisões estratégicas.",
+        "Implementação de soluções de automação usando Power Platform, eliminando tarefas repetitivas e otimizando fluxos de trabalho empresariais.",
       features: [
-        "Chatbots corporativos",
-        "Análise preditiva de dados",
-        "Automação de processos (RPA)",
-        "Machine Learning personalizado",
-        "Dashboards inteligentes",
+        "Power Automate para workflows",
+        "Power Apps para aplicações corporativas",
+        "Power BI para análise de dados",
+        "Integração com sistemas existentes",
+        "Automação de processos manuais",
       ],
-      color: "from-tech-cyan to-tech-green",
+      color: "from-tech-cyan to-tech-cyan",
       details: {
-        id: "inteligencia-artificial",
-        overview: "Desenvolvemos soluções de IA personalizadas usando Azure Cognitive Services, OpenAI e frameworks como TensorFlow. Nosso foco é resolver problemas reais de negócio através de automação inteligente, análise preditiva e processamento de linguagem natural.",
-        duration: "3-9 meses (dependendo da complexidade dos modelos de IA)",
-        targetAudience: "Empresas com grandes volumes de dados, processos repetitivos ou necessidade de insights preditivos para tomada de decisão",
-        prerequisites: "Base de dados históricos, definição clara dos objetivos de IA e equipe interna designada para validação",
+        id: "automacao-processos",
+        overview: "Desenvolvemos soluções de automação personalizadas usando Microsoft Power Platform, focando na eliminação de processos manuais e otimização de fluxos de trabalho. Nossa abordagem garante ROI rápido e adoção facilitada pelos usuários.",
+        duration: "3-8 semanas (dependendo da complexidade dos processos)",
+        targetAudience: "Empresas com processos manuais repetitivos, necessidade de aplicações internas ou análise de dados",
+        prerequisites: "Mapeamento dos processos atuais, acesso aos sistemas envolvidos e definição de objetivos de automação",
         features: [
-          { id: "chatbots", name: "Chatbots Inteligentes", description: "Azure Bot Framework com processamento de linguagem natural e integração com sistemas internos" },
-          { id: "predictive", name: "Análise Preditiva", description: "Modelos de machine learning para forecasting, detecção de anomalias e análise de tendências" },
-          { id: "rpa", name: "RPA Avançado", description: "Power Automate Desktop com IA para automação de processos complexos e documentos" },
-          { id: "computer-vision", name: "Visão Computacional", description: "Reconhecimento de documentos, OCR inteligente e análise de imagens" },
-          { id: "analytics", name: "Analytics com IA", description: "Power BI com AI insights, clustering automático e detecção de padrões" }
+          { id: "power-automate", name: "Power Automate", description: "Workflows automatizados para aprovações, notificações e integrações" },
+          { id: "power-apps", name: "Power Apps", description: "Aplicações corporativas sem código para processos específicos" },
+          { id: "power-bi", name: "Power BI", description: "Dashboards interativos e relatórios automatizados para tomada de decisão" },
+          { id: "system-integration", name: "Integração de Sistemas", description: "Conectores para ERP, CRM e outras plataformas corporativas" },
+          { id: "process-optimization", name: "Otimização de Processos", description: "Análise e redesenho de fluxos para máxima eficiência" }
         ],
         benefits: [
-          { id: "automation", title: "Automação Massiva", description: "70-90% dos processos manuais automatizados com IA", icon: "🤖" },
-          { id: "insights", title: "Insights Preditivos", description: "Previsões precisas para planejamento estratégico", icon: "💡" },
-          { id: "efficiency", title: "Eficiência Extrema", description: "Redução de 50-70% no tempo de análise de dados", icon: "⚡" },
-          { id: "competitive", title: "Vantagem Competitiva", description: "Decisões baseadas em IA para superar concorrentes", icon: "🎯" }
+          { id: "efficiency-gain", title: "Ganho de Eficiência", description: "60-80% de redução no tempo de processos manuais", icon: "⚡" },
+          { id: "error-reduction", title: "Redução de Erros", description: "Eliminação de erros humanos em processos críticos", icon: "✅" },
+          { id: "data-insights", title: "Insights de Dados", description: "Visibilidade completa dos processos com métricas em tempo real", icon: "📊" },
+          { id: "quick-roi", title: "ROI Rápido", description: "Retorno do investimento em 6-12 meses", icon: "💰" }
         ],
         deliverables: [
-          "Modelos de IA treinados e validados com seus dados reais",
-          "APIs personalizadas para integração com sistemas existentes",
-          "Interface web responsiva para interação com modelos de IA",
-          "Pipeline de dados automatizado para retreinamento contínuo",
-          "Documentação técnica detalhada e guias de uso",
-          "Transferência completa de conhecimento e código-fonte"
+          "Soluções Power Platform implementadas e funcionais",
+          "Documentação técnica e manual do usuário",
+          "Treinamento para usuários finais e administradores",
+          "Dashboards de monitoramento dos processos automatizados",
+          "Suporte técnico pós-implementação por período definido",
+          "Código-fonte e configurações para futuras manutenções"
         ],
-        methodology: "Aplicamos metodologia CRISP-DM adaptada para IA: Business Understanding (entendimento do negócio), Data Understanding (análise exploratória), Data Preparation (limpeza e feature engineering), Modeling (desenvolvimento e teste de algoritmos), Evaluation (validação com métricas de negócio) e Deployment (produção com monitoramento contínuo)."
+        methodology: "Utilizamos Design Thinking combinado com metodologia ágil: Descoberta (mapeamento de processos), Ideação (definição de soluções), Prototipação (desenvolvimento iterativo), Testes (validação com usuários), Implementação (deploy gradual). Cada sprint inclui validação com stakeholders."
       }
     },
   ];
@@ -232,20 +232,20 @@ export default function ServicesGrid() {
         {/* Título da seção */}
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-            Nossos <span className="text-tech-cyan font-bold">Serviços</span>
+            Nossos <span className="text-gradient">Serviços</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Soluções completas em tecnologia para transformar seu negócio e
-            gerar resultados mensuráveis
+            Soluções especializadas em Microsoft 365 e automação para
+            empresas que buscam modernização e eficiência operacional
           </p>
         </div>
 
-        {/* Grid de serviços com expansão corrigida */}
+        {/* Grid de serviços com expansão */}
         <div className="mb-16 space-y-8">
           {/* Primeira linha: Serviços 0 e 1 */}
           <div>
             <div className="grid lg:grid-cols-2 gap-8">
-              {/* Implementação de Software */}
+              {/* Migração Microsoft 365 */}
               <div className="relative">
                 <div
                   className={`card-hover bg-gray-50 rounded-2xl p-8 border-2 transition-all duration-300 cursor-pointer group ${
@@ -255,8 +255,15 @@ export default function ServicesGrid() {
                   }`}
                   onClick={() => setActiveService(0)}
                 >
+                  {/* Badge de destaque */}
+                  <div className="absolute -top-3 left-6">
+                    <div className="bg-tech-gradient text-white px-4 py-1 rounded-full text-xs font-semibold">
+                      🌟 Serviço Principal
+                    </div>
+                  </div>
+
                   {/* Header do card */}
-                  <div className="flex items-start gap-4 mb-6">
+                  <div className="flex items-start gap-4 mb-6 mt-2">
                     <div
                       className={`w-16 h-16 bg-gradient-to-r ${servicesData[0].color} rounded-xl flex items-center justify-center text-2xl flex-shrink-0 hover:scale-110 transition-transform duration-300`}
                     >
@@ -270,6 +277,13 @@ export default function ServicesGrid() {
                         {servicesData[0].subtitle}
                       </p>
                     </div>
+                  </div>
+
+                  {/* Destaque de preço */}
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                    <p className="text-green-800 text-sm font-semibold">
+                      💰 Solução sob medida para sua empresa | ⏱️ 2-6 semanas
+                    </p>
                   </div>
 
                   {/* Descrição */}
@@ -381,7 +395,7 @@ export default function ServicesGrid() {
                         <ChevronDown className="w-4 h-4" />
                       )}
                     </button>
-                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -401,7 +415,7 @@ export default function ServicesGrid() {
           {/* Segunda linha: Serviços 2 e 3 */}
           <div>
             <div className="grid lg:grid-cols-2 gap-8">
-              {/* Cloud Service */}
+              {/* Consultoria Cloud */}
               <div className="relative">
                 <div
                   className={`card-hover bg-gray-50 rounded-2xl p-8 border-2 transition-all duration-300 cursor-pointer group ${
@@ -471,7 +485,7 @@ export default function ServicesGrid() {
                 </div>
               </div>
 
-              {/* Inteligência Artificial */}
+              {/* Automação de Processos */}
               <div className="relative">
                 <div
                   className={`card-hover bg-gray-50 rounded-2xl p-8 border-2 transition-all duration-300 cursor-pointer group ${
@@ -555,75 +569,56 @@ export default function ServicesGrid() {
           </div>
         </div>
 
-        {/* Seção de destaque */}
-        <div className="bg-gray-50 rounded-2xl p-8 lg:p-12 tech-border-hover tech-shadow">
-          <div className="text-center">
-            <h3 className="text-3xl font-bold text-gray-900 mb-6">
-              Não sabe por onde começar?
-            </h3>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Oferecemos um{" "}
-              <span className="text-tech-cyan font-semibold">
-                diagnóstico gratuito{" "}
-              </span>
-              da sua infraestrutura tecnológica atual, identificando
-              oportunidades de melhoria e criando um roadmap personalizado para
-              sua empresa.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="btn-primary text-lg px-8 py-4 animate-gradient hover:scale-105 transition-all duration-300">
-                Solicitar Diagnóstico Gratuito
-              </button>
-              <div className="text-gray-500 text-sm">
-                ✓ Sem compromisso • ✓ Relatório detalhado • ✓ Consultoria
-                especializada
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Processo de trabalho */}
+        {/* Processo de trabalho - Metodologia PDCA */}
         <div className="mt-16">
-          <h3 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            Como <span className="text-tech-cyan font-bold">Trabalhamos</span>
+          <h3 className="text-3xl font-bold text-center text-gray-900 mb-6">
+            Nossa <span className="text-gradient">Metodologia PDCA</span>
           </h3>
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            Utilizamos a metodologia PDCA (Plan-Do-Check-Act) integrada com práticas ágeis 
+            para garantir resultados consistentes e melhoria contínua
+          </p>
 
           <div className="grid md:grid-cols-4 gap-8">
             {[
               {
-                step: "01",
-                title: "Análise",
-                desc: "Avaliação completa da sua infraestrutura atual",
+                step: "PLAN",
+                title: "Planejamento",
+                desc: "Análise detalhada do ambiente atual e definição da estratégia de migração",
+                icon: "📋",
                 bgColor: "bg-tech-cyan"
               },
               {
-                step: "02",
-                title: "Estratégia",
-                desc: "Desenvolvimento de plano personalizado",
-                bgColor: "bg-tech-cyan"
+                step: "DO", 
+                title: "Execução",
+                desc: "Implementação controlada por lotes com monitoramento em tempo real",
+                icon: "⚙️",
+                bgColor: "bg-tech-electric"
               },
               {
-                step: "03",
-                title: "Implementação",
-                desc: "Execução com metodologias ágeis",
-                bgColor: "bg-tech-cyan"
+                step: "CHECK",
+                title: "Verificação", 
+                desc: "Validação contínua dos resultados com logs detalhados e métricas",
+                icon: "✅",
+                bgColor: "bg-tech-deep"
               },
               {
-                step: "04",
-                title: "Suporte",
-                desc: "Acompanhamento contínuo e otimização",
-                bgColor: "bg-tech-cyan"
+                step: "ACT",
+                title: "Ação/Melhoria",
+                desc: "Ajustes e otimizações baseados nos resultados e feedback",
+                icon: "🔄",
+                bgColor: "bg-tech-indigo"
               },
             ].map((item, index) => (
               <div key={index} className="text-center group">
-                <div className={`w-16 h-16 ${item.bgColor} rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl group-hover:scale-110 transition-transform duration-300 animate-pulse-tech`}>
-                  {item.step}
+                <div className={`w-20 h-20 ${item.bgColor} rounded-xl flex flex-col items-center justify-center mx-auto mb-4 text-white group-hover:scale-110 transition-transform duration-300 shadow-lg hover:shadow-xl`}>
+                  <div className="text-2xl mb-1">{item.icon}</div>
+                  <div className="text-xs font-bold">{item.step}</div>
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2 transition-all duration-300">
+                <h4 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-tech-cyan transition-colors">
                   {item.title}
                 </h4>
-                <p className="text-gray-600 text-sm">{item.desc}</p>
+                <p className="text-gray-600 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -633,7 +628,7 @@ export default function ServicesGrid() {
   );
 }
 
-// Service Details Panel Component - Layout mais compacto e sem cortes
+// Service Details Panel Component - Layout otimizado
 const ServiceDetailsPanel = ({ service }: { service: ServiceDetails }) => {
   return (
     <div className="space-y-6">
@@ -752,10 +747,18 @@ const ServiceDetailsPanel = ({ service }: { service: ServiceDetails }) => {
             <h5 className="text-sm font-bold mb-2">Interessado neste serviço?</h5>
             <p className="mb-3 opacity-90 text-xs">Entre em contato para orçamento personalizado</p>
             <div className="space-y-2">
-              <button className="bg-white text-tech-cyan font-semibold px-4 py-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover:scale-105 w-full text-xs">
+              <button className="bg-white text-tech-cyan font-semibold px-4 py-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover:scale-105 w-full text-xs"
+                onClick={() => {
+                  window.open('https://wa.me/5512992367544?text=Olá! Gostaria de receber um orçamento personalizado.', '_blank');
+                }}
+              >
                 Solicitar Orçamento
               </button>
-              <button className="bg-white/20 backdrop-blur-sm border border-white/30 text-white font-semibold px-4 py-2 rounded-lg hover:bg-white/30 transition-all duration-300 hover:scale-105 w-full text-xs">
+              <button className="bg-white/20 backdrop-blur-sm border border-white/30 text-white font-semibold px-4 py-2 rounded-lg hover:bg-white/30 transition-all duration-300 hover:scale-105 w-full text-xs"
+                onClick={() => {
+                  window.open('https://wa.me/5512992367544?text=Olá! Gostaria de agendar uma reunião para conversar sobre soluções.', '_blank');
+                }}
+              >
                 Agendar Reunião
               </button>
             </div>
