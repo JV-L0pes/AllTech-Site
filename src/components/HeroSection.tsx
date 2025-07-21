@@ -376,7 +376,7 @@ const ProgressBar = ({ currentSlide, totalSlides, isTransitioning, progress }: {
 export default function HeroSection() {
   const isVisible = useVisibilityObserver('inicio');
   const { isLowPerformance } = usePerformanceOptimizations();
-  
+
   const slides: readonly Slide[] = useMemo(() => [
     {
       id: 1,

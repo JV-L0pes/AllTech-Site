@@ -24,7 +24,7 @@ export default function Header() {
         : 'bg-white/95 border-gray-200 shadow-lg'
     }`}>
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center py-2">
+        <div className="flex justify-between items-center py-1 min-h-[68px]"> {/* Ajuste para 68px */}
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex items-center gap-3">
@@ -32,8 +32,8 @@ export default function Header() {
               <Image
                 src="/images/Alltech-logo.png"
                 alt="AllTech Digital"
-                width={80}
-                height={80}
+                width={68}
+                height={68}
                 className="logo-no-background drop-shadow-sm hover:scale-105 transition-transform duration-200"
                 priority
               />
