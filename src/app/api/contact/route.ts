@@ -1,4 +1,4 @@
-// src/app/api/contact/route.ts
+// src/app/api/contact/route.ts - SUBSTITUIR ARQUIVO COMPLETO
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import Database from '@/lib/database';
@@ -26,6 +26,56 @@ interface ContactFormResponse {
   errors?: any[];
 }
 
+// Middleware de segurança CSRF
+function withCSRFProtection(handler: Function) {
+  return async (request: NextRequest, context: any) => {
+    const methodsToProtect = ['POST', 'PUT', 'PATCH', 'DELETE'];
+    
+    if (!methodsToProtect.includes(request.method)) {
+      return handler(request, context);
+    }
+
+    // Validar CSRF token
+    const token = request.headers.get('x-csrf-token');
+    const cookieHash = request.cookies.get('__csrf_hash')?.value;
+    const cookieExpires = request.cookies.get('__csrf_expires')?.value;
+
+    if (!token || !cookieHash || !cookieExpires) {
+      console.log('🔒 CSRF validation failed - missing data:', {
+        hasToken: !!token,
+        hasCookieHash: !!cookieHash,
+        hasCookieExpires: !!cookieExpires
+      });
+
+      return NextResponse.json({
+        success: false,
+        message: 'Falha na validação de segurança. Recarregue a página e tente novamente.',
+        error: 'CSRF_VALIDATION_FAILED'
+      }, { 
+        status: 403,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Content-Type-Options': 'nosniff',
+        }
+      });
+    }
+
+    // Verificar se token não expirou
+    const expires = parseInt(cookieExpires);
+    if (Date.now() > expires) {
+      console.log('🔒 CSRF token expired');
+      
+      return NextResponse.json({
+        success: false,
+        message: 'Token de segurança expirado. Recarregue a página.',
+        error: 'CSRF_TOKEN_EXPIRED'
+      }, { status: 403 });
+    }
+
+    return handler(request, context);
+  };
+}
+
 // Domain Services
 class SalesRepresentativeService {
   private static readonly DEFAULT_SALES_REP: SalesRepresentative = {
@@ -35,25 +85,19 @@ class SalesRepresentativeService {
     region: 'Nacional'
   };
 
-  private static readonly STATE_TO_REGION_MAP = new Map([
-    ['SP', 'Sudeste'], ['RJ', 'Sudeste'], ['MG', 'Sudeste'], ['ES', 'Sudeste'],
-    ['RS', 'Sul'], ['SC', 'Sul'], ['PR', 'Sul'],
-    ['GO', 'Centro-Oeste'], ['MT', 'Centro-Oeste'], ['MS', 'Centro-Oeste'], ['DF', 'Centro-Oeste'],
-    ['BA', 'Nordeste'], ['SE', 'Nordeste'], ['AL', 'Nordeste'], ['PE', 'Nordeste'],
-    ['PB', 'Nordeste'], ['RN', 'Nordeste'], ['CE', 'Nordeste'], ['PI', 'Nordeste'], ['MA', 'Nordeste'],
-    ['AC', 'Norte'], ['RO', 'Norte'], ['AM', 'Norte'], ['RR', 'Norte'], ['PA', 'Norte'], ['AP', 'Norte'], ['TO', 'Norte']
-  ]);
-
-  static getRegionByState(state: string): string {
-    return this.STATE_TO_REGION_MAP.get(state.toUpperCase()) || 'Nacional';
-  }
-
   static getDefaultSalesRep(): SalesRepresentative {
     return { ...this.DEFAULT_SALES_REP };
   }
 
   static createSalesRepFromState(state: string): SalesRepresentative {
-    const region = this.getRegionByState(state);
+    const regionMap = new Map([
+      ['SP', 'Sudeste'], ['RJ', 'Sudeste'], ['MG', 'Sudeste'], ['ES', 'Sudeste'],
+      ['RS', 'Sul'], ['SC', 'Sul'], ['PR', 'Sul'],
+      ['GO', 'Centro-Oeste'], ['MT', 'Centro-Oeste'], ['MS', 'Centro-Oeste'], ['DF', 'Centro-Oeste'],
+    ]);
+
+    const region = regionMap.get(state?.toUpperCase()) || 'Nacional';
+    
     return {
       ...this.DEFAULT_SALES_REP,
       region
@@ -61,7 +105,7 @@ class SalesRepresentativeService {
   }
 }
 
-// Repository Interface (seguindo DDD)
+// Repository Interface
 interface ILeadRepository {
   createLead(leadData: ContactFormData): Promise<{ leadId: string; salesRep: SalesRepresentative }>;
 }
@@ -77,13 +121,14 @@ class ContactFormApplicationService {
     console.log(`🔄 Processando formulário para: ${data.name} (${data.company || 'Pessoa Física'})`);
     
     // Log de segurança para auditoria
-    SecurityService.logSecurityEvent('FORM_SUBMISSION', {
+    console.log('🔒 CONTACT_FORM_SUBMISSION:', {
       name: data.name,
       email: data.email,
       company: data.company,
       state: data.state,
-      serviceOfInterest: data.serviceOfInterest
-    }, request);
+      serviceOfInterest: data.serviceOfInterest,
+      ip: request.headers.get('x-forwarded-for') || 'unknown'
+    });
     
     // Criar lead no repositório
     const result = await this.leadRepository.createLead(data);
@@ -270,7 +315,7 @@ class DatabaseLeadRepository implements ILeadRepository {
 
   private async getSalesRepresentative(client: any, state?: string): Promise<SalesRepresentative> {
     try {
-      // Buscar qualquer vendedor ativo (agora só tem o chefe)
+      // Buscar vendedor ativo
       const result = await client.query(`
         SELECT id, name, email, region 
         FROM sales_representatives 
@@ -289,11 +334,13 @@ class DatabaseLeadRepository implements ILeadRepository {
         };
       }
 
-      throw new Error('Nenhum vendedor ativo encontrado');
+      // Fallback para vendedor padrão
+      console.log('⚠️ Nenhum vendedor no banco, usando padrão');
+      return SalesRepresentativeService.createSalesRepFromState(state || '');
       
     } catch (error) {
-      console.error(`❌ Erro ao buscar vendedor:`, error);
-      throw new Error(`Erro ao determinar vendedor responsável: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      console.error(`❌ Erro ao buscar vendedor, usando padrão:`, error);
+      return SalesRepresentativeService.createSalesRepFromState(state || '');
     }
   }
 
@@ -349,45 +396,31 @@ class ContactFormServiceFactory {
   }
 }
 
-// API Handler com segurança
+// API Handler
 async function handlePOST(request: NextRequest) {
   try {
     console.log('📨 Recebendo solicitação de contato...');
     
-    // Proteção CORS
+    // Validação CORS básica
+    const origin = request.headers.get('origin');
     const allowedOrigins = [
       'http://localhost:3000',
-      'http://localhost:3001',
       'https://localhost:3000',
-      'https://localhost:3001',
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:3001',
-      'https://127.0.0.1:3000',
-      'https://127.0.0.1:3001',
-      // Permitir domínios ngrok para desenvolvimento
-      ...((request.headers.get('origin') || '').includes('ngrok') ? [request.headers.get('origin')] : [])
-    ];
-    const origin = request.headers.get('origin');
-    if (origin && !allowedOrigins.includes(origin)) {
-      return new Response('CORS Forbidden', {
-        status: 403,
-        headers: {
-          'Content-Type': 'text/plain',
-          'Access-Control-Allow-Origin': 'null',
-        }
-      });
-    }
-    
-    // Validação CSRF
-    const csrfToken = request.headers.get('x-csrf-token');
-    if (!csrfToken || typeof csrfToken !== 'string' || csrfToken.length < 10) {
+      process.env.NEXT_PUBLIC_DOMAIN || '',
+    ].filter(Boolean);
+
+    if (origin && !allowedOrigins.includes(origin) && !origin.includes('ngrok')) {
+      console.log('🚫 CORS violation:', origin);
       return NextResponse.json({
         success: false,
-        message: 'Falha de segurança: token CSRF ausente ou inválido.'
+        message: 'Origem não autorizada'
       }, { status: 403 });
     }
     
     const body = await request.json();
+    
+    // DEBUG: Vamos ver o que está sendo enviado
+    console.log('📋 Dados recebidos:', JSON.stringify(body, null, 2));
     
     // Validar dados de entrada
     const validatedData = contactFormSchema.parse(body);
@@ -415,7 +448,7 @@ async function handlePOST(request: NextRequest) {
         'Content-Type': 'application/json',
         'X-Content-Type-Options': 'nosniff',
         'X-Frame-Options': 'DENY',
-        'X-XSS-Protection': '1; mode=block',
+        'Cache-Control': 'no-store',
         ...(origin ? { 'Access-Control-Allow-Origin': origin } : {})
       }
     });
@@ -443,39 +476,25 @@ async function handlePOST(request: NextRequest) {
   }
 }
 
-// Health check com informações de segurança
+// Health check
 async function handleGET() {
   try {
-    console.log('🔍 Executando health check completo...');
+    console.log('🔍 Executando health check...');
     
     const db = Database.getInstance();
-    const diagnostic = await db.runDiagnostic();
+    const isHealthy = await db.testConnection();
     
-    if (diagnostic.connection && diagnostic.tables && diagnostic.salesReps && diagnostic.permissions) {
-      const salesRepsResult = await db.query('SELECT COUNT(*) as count FROM sales_representatives WHERE is_active = TRUE');
-      const salesRepsCount = salesRepsResult.rows[0].count;
-      
+    if (isHealthy) {
       return NextResponse.json({
         status: 'healthy',
-        message: 'Sistema funcionando perfeitamente',
+        message: 'Sistema funcionando',
         timestamp: new Date().toISOString(),
-        security: {
-          rateLimiting: !!process.env.RATE_LIMIT_REQUESTS_PER_MINUTE,
-          emailService: EmailService.isConfigured(),
-          securityHeaders: true
-        },
-        database: {
-          connected: true,
-          salesRepresentatives: parseInt(salesRepsCount)
-        },
-        version: '4.0.0-secure'
+        version: '1.0.0'
       });
     } else {
       return NextResponse.json({
         status: 'unhealthy',
-        message: 'Sistema com problemas',
-        timestamp: new Date().toISOString(),
-        issues: diagnostic
+        message: 'Problemas de conectividade'
       }, { status: 503 });
     }
     
@@ -489,6 +508,19 @@ async function handleGET() {
   }
 }
 
-// Exportar handlers com middleware de segurança
-export const POST = withSecurity(withRateLimit(handlePOST));
+// Exportar handlers com proteções
+export const POST = withCSRFProtection(withRateLimit(withSecurity(handlePOST)));
 export const GET = handleGET;
+
+// OPTIONS para CORS
+export async function OPTIONS(request: NextRequest) {
+  return NextResponse.json({}, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
+      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, X-CSRF-Token',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
+}

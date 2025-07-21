@@ -1,18 +1,10 @@
-// src/components/ContactForm.tsx
+// src/components/ContactForm.tsx - SUBSTITUIR ARQUIVO COMPLETO
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { Mail, Phone, MapPin, CheckCircle, AlertCircle, Loader2, User, Building } from "lucide-react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { Mail, Phone, MapPin, CheckCircle, AlertCircle, Loader2, User, Building, Shield } from "lucide-react";
 
-// Adicionar declaração global para evitar erro TS
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-declare global {
-  interface Window {
-    onRecaptchaSuccess?: (token: string) => void;
-  }
-}
-
-// Domain Types
+// Interfaces de domínio
 interface ContactFormData {
   name: string;
   email: string;
@@ -30,7 +22,7 @@ interface FormErrors {
   [key: string]: string;
 }
 
-type SubmissionStatus = 'idle' | 'submitting' | 'success' | 'error';
+type SubmissionStatus = 'idle' | 'loading_csrf' | 'submitting' | 'success' | 'error';
 
 interface ApiResponse {
   success: boolean;
@@ -43,55 +35,61 @@ interface ApiResponse {
   errors?: any[];
 }
 
-// Validation Service
-class ValidationService {
-  private static readonly EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  private static readonly PHONE_REGEX = /^\(\d{2}\)\s\d{4,5}-\d{4}$/;
-  private static readonly CNPJ_REGEX = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
+// Serviço de CSRF Token Seguro
+class CSRFTokenService {
+  private static token: string | null = null;
+  private static tokenExpiry: number = 0;
+  private static readonly TOKEN_VALIDITY_MS = 3600000; // 1 hora
 
-  static validateForm(data: ContactFormData): FormErrors {
-    const errors: FormErrors = {};
-
-    // Nome obrigatório
-    if (!data.name.trim()) {
-      errors.name = "Nome é obrigatório";
-    } else if (data.name.length < 2) {
-      errors.name = "Nome deve ter pelo menos 2 caracteres";
-    } else if (data.name.trim().split(' ').length < 2) {
-      errors.name = "Por favor, insira seu nome completo (nome e sobrenome)";
-    } else if (data.name.includes('  ')) {
-      errors.name = "Nome não pode conter espaços duplos";
+  static async getToken(force = false): Promise<string> {
+    const now = Date.now();
+    
+    // Retornar token válido se ainda não expirou
+    if (!force && this.token && now < this.tokenExpiry) {
+      return this.token;
     }
 
-    // Email obrigatório
-    if (!data.email.trim()) {
-      errors.email = "Email é obrigatório";
-    } else if (!this.EMAIL_REGEX.test(data.email)) {
-      errors.email = "Email inválido";
-    }
+    try {
+      console.log('🔄 Obtendo novo token CSRF...');
+      
+      const response = await fetch('/api/csrf', {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache',
+        },
+      });
 
-    // Mensagem obrigatória
-    if (!data.message.trim()) {
-      errors.message = "Mensagem é obrigatória";
-    } else if (data.message.length < 10) {
-      errors.message = "Mensagem deve ter pelo menos 10 caracteres";
-    }
+      if (!response.ok) {
+        throw new Error(`Falha ao obter token CSRF: ${response.status}`);
+      }
 
-    // Telefone: só valida se preenchido
-    if (data.phone && !this.PHONE_REGEX.test(data.phone)) {
-      errors.phone = "Formato: (11) 99999-9999";
-    }
+      const data = await response.json();
+      
+      if (!data.success || !data.csrfToken) {
+        throw new Error('Resposta inválida do servidor para token CSRF');
+      }
 
-    // CNPJ: só valida se preenchido
-    if (data.cnpj && !this.CNPJ_REGEX.test(data.cnpj)) {
-      errors.cnpj = "Formato: 00.000.000/0000-00";
+      this.token = data.csrfToken;
+      this.tokenExpiry = now + this.TOKEN_VALIDITY_MS;
+      
+      console.log('✅ Token CSRF obtido com sucesso');
+      return this.token as string;
+      
+    } catch (error) {
+      console.error('❌ Erro ao obter token CSRF:', error);
+      throw new Error('Falha na segurança: não foi possível obter token de proteção');
     }
+  }
 
-    return errors;
+  static clearToken(): void {
+    this.token = null;
+    this.tokenExpiry = 0;
   }
 }
 
-// Formatting utilities
+// Formatadores
 class FormatterUtils {
   static formatCNPJ(value: string): string {
     const numbers = value.replace(/\D/g, '');
@@ -112,117 +110,188 @@ class FormatterUtils {
   }
 }
 
-// Contact Form Hook
-function useContactForm() {
+// Hook principal do formulário
+function useSecureContactForm() {
   const [formData, setFormData] = useState<ContactFormData>({
-    name: "",
-    email: "",
-    company: "",
-    phone: "",
-    cnpj: "",
-    numberOfEmployees: "",
-    state: "",
-    city: "",
-    serviceOfInterest: "",
-    message: "",
+    name: "", email: "", company: "", phone: "", cnpj: "",
+    numberOfEmployees: "", state: "", city: "", serviceOfInterest: "", message: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<SubmissionStatus>('idle');
   const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
+  const [lgpdConsent, setLgpdConsent] = useState(false);
+  const [securityInfo, setSecurityInfo] = useState({ csrfReady: false, attempts: 0 });
+  
+  // Refs para controle
+  const submissionAttempts = useRef(0);
+  const lastSubmissionTime = useRef(0);
+  const isSubmitting = useRef(false);
 
   const updateField = useCallback((field: keyof ContactFormData, value: string) => {
-    setFormData(prev => {
-      const newData = { ...prev, [field]: value };
-      
-      // Auto-format certain fields
-      if (field === 'phone') {
-        newData.phone = FormatterUtils.formatPhone(value);
-      } else if (field === 'cnpj') {
-        newData.cnpj = FormatterUtils.formatCNPJ(value);
-      }
-      
-      return newData;
-    });
+    let formattedValue = value;
     
-    // Clear error when user starts typing
+    // Auto-formatação
+    if (field === 'phone') {
+      formattedValue = FormatterUtils.formatPhone(value);
+    } else if (field === 'cnpj') {
+      formattedValue = FormatterUtils.formatCNPJ(value);
+    }
+    
+    setFormData(prev => ({ ...prev, [field]: formattedValue }));
+    
+    // Limpar erro quando usuário digita
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: "" }));
     }
   }, [errors]);
 
-  const submitForm = useCallback(async (e: React.FormEvent, csrfToken: string) => {
+  // Inicializar CSRF
+  useEffect(() => {
+    const initializeSecurity = async () => {
+      try {
+        await CSRFTokenService.getToken();
+        setSecurityInfo(prev => ({ ...prev, csrfReady: true }));
+      } catch (error) {
+        console.error('Falha ao inicializar segurança:', error);
+        setErrors({ security: 'Erro de segurança. Recarregue a página.' });
+      }
+    };
+
+    initializeSecurity();
+  }, []);
+
+  const submitForm = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const validationErrors = ValidationService.validateForm(formData);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+    // Prevenir submissões duplicadas
+    if (isSubmitting.current) {
+      console.log('⚠️ Submissão já em andamento...');
       return;
     }
 
-    setStatus('submitting');
-    setApiResponse(null);
+    const now = Date.now();
+    
+    // Rate limiting local
+    if (submissionAttempts.current >= 3 && now - lastSubmissionTime.current < 60000) {
+      setErrors({ 
+        submission: 'Muitas tentativas. Aguarde 1 minuto.' 
+      });
+      return;
+    }
 
+    // Validações básicas
+    const basicErrors: FormErrors = {};
+    
+    if (!formData.name.trim()) {
+      basicErrors.name = 'Nome é obrigatório';
+    } else if (formData.name.trim().split(' ').length < 2) {
+      basicErrors.name = 'Digite nome e sobrenome';
+    }
+    
+    if (!formData.email.trim()) {
+      basicErrors.email = 'Email é obrigatório';
+    }
+    
+    if (!formData.message.trim()) {
+      basicErrors.message = 'Mensagem é obrigatória';
+    } else if (formData.message.length < 10) {
+      basicErrors.message = 'Mensagem deve ter pelo menos 10 caracteres';
+    }
+
+    if (!lgpdConsent) {
+      basicErrors.lgpd = 'É necessário aceitar o consentimento LGPD';
+    }
+
+    if (Object.keys(basicErrors).length > 0) {
+      setErrors(basicErrors);
+      return;
+    }
+
+    isSubmitting.current = true;
+    setStatus('submitting');
+    setErrors({});
+    setApiResponse(null);
+    
     try {
+      submissionAttempts.current++;
+      lastSubmissionTime.current = now;
+
+      // Obter token CSRF
+      const csrfToken = await CSRFTokenService.getToken(true);
+
+      console.log('📤 Enviando formulário...');
+      
       const response = await fetch('/api/contact', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': csrfToken, // Adiciona o token CSRF ao header
+          'X-CSRF-Token': csrfToken,
+          'Cache-Control': 'no-cache',
         },
-        body: JSON.stringify({ ...formData }), // Adiciona o token do reCAPTCHA ao body
+        body: JSON.stringify(formData),
       });
 
       const result: ApiResponse = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || 'Erro ao enviar formulário');
+        // CSRF falhou, limpar token
+        if (response.status === 403) {
+          CSRFTokenService.clearToken();
+          setSecurityInfo(prev => ({ ...prev, csrfReady: false }));
+        }
+        
+        throw new Error(result.message || `Erro HTTP ${response.status}`);
       }
 
       if (result.success) {
+        // Reset form
         setFormData({
-          name: "",
-          email: "",
-          company: "",
-          phone: "",
-          cnpj: "",
-          numberOfEmployees: "",
-          state: "",
-          city: "",
-          serviceOfInterest: "",
-          message: "",
+          name: "", email: "", company: "", phone: "", cnpj: "",
+          numberOfEmployees: "", state: "", city: "", serviceOfInterest: "", message: "",
         });
-        setErrors({});
+        setLgpdConsent(false);
         setStatus('success');
         setApiResponse(result);
         
-        // Reset success message after 15 seconds
+        // Reset tentativas
+        submissionAttempts.current = 0;
+        
+        // Auto-hide após 15s
         setTimeout(() => {
           setStatus('idle');
           setApiResponse(null);
         }, 15000);
+        
+        console.log('✅ Formulário enviado com sucesso!');
       } else {
-        throw new Error('Resposta inválida do servidor');
+        throw new Error('Resposta inválida');
       }
     } catch (error) {
-      console.error('Erro ao enviar formulário:', error);
+      console.error('❌ Erro ao enviar:', error);
+      
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      setErrors({ 
+        submission: errorMessage.includes('CSRF') 
+          ? 'Erro de segurança. Recarregue a página.' 
+          : errorMessage 
+      });
       setStatus('error');
+      
       setTimeout(() => setStatus('idle'), 8000);
+    } finally {
+      isSubmitting.current = false;
     }
-  }, [formData]);
+  }, [formData, lgpdConsent, status]);
 
   return {
-    formData,
-    errors,
-    status,
-    apiResponse,
-    updateField,
-    submitForm,
-    setErrors,
+    formData, errors, status, apiResponse, lgpdConsent, securityInfo,
+    updateField, submitForm, setLgpdConsent, setErrors,
   };
 }
 
-// Input Component
+// Componente de Input
 interface InputFieldProps {
   id: string;
   label: string;
@@ -234,34 +303,21 @@ interface InputFieldProps {
   required?: boolean;
   icon?: React.ReactNode;
   maxLength?: number;
-  labelClassName?: string;
 }
 
 function InputField({
-  id,
-  label,
-  type = "text",
-  value,
-  onChange,
-  error,
-  placeholder,
-  required = false,
-  icon,
-  maxLength,
-  labelClassName = "",
-  inputClassName = ""
-}: InputFieldProps & { labelClassName?: string; inputClassName?: string }) {
+  id, label, type = "text", value, onChange, error, placeholder, required = false, icon, maxLength
+}: InputFieldProps) {
   const inputClass = [
     "w-full px-4 py-3 border rounded-lg transition-all bg-white",
     "focus:ring-2 focus:ring-tech-cyan focus:border-transparent",
     error ? "border-2 border-red-600 ring-2 ring-red-100" : "border-gray-300 hover:border-tech-cyan/50",
     icon ? "pl-12" : "pl-4",
-    inputClassName
   ].join(" ");
 
   return (
     <div className="relative mb-2">
-      <label htmlFor={id} className={`block text-sm font-semibold text-gray-700 mb-2 ${labelClassName}`}>
+      <label htmlFor={id} className="block text-sm font-semibold text-gray-700 mb-2">
         {label} {required && <span className="text-red-600">*</span>}
       </label>
       <div className="relative">
@@ -279,7 +335,6 @@ function InputField({
             placeholder={placeholder}
             rows={5}
             maxLength={maxLength}
-            aria-describedby={error ? `${id}-error` : undefined}
           />
         ) : type === 'select' ? (
           <select
@@ -287,7 +342,6 @@ function InputField({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             className={inputClass}
-            aria-describedby={error ? `${id}-error` : undefined}
           >
             <option value="">Selecione um serviço</option>
             <option value="Migração para Microsoft 365">Migração para Microsoft 365</option>
@@ -306,12 +360,11 @@ function InputField({
             className={inputClass}
             placeholder={placeholder}
             maxLength={maxLength}
-            aria-describedby={error ? `${id}-error` : undefined}
           />
         )}
       </div>
       {error && (
-        <p id={`${id}-error`} className="text-red-600 text-sm mt-2 font-semibold" role="alert">
+        <p className="text-red-600 text-sm mt-2 font-semibold" role="alert">
           {error}
         </p>
       )}
@@ -319,108 +372,39 @@ function InputField({
   );
 }
 
-// Contact Info Component
-function ContactInfo() {
-  const contactItems = [
-    {
-      icon: Mail,
-      title: "Email",
-      value: "ulysses.lima@alltechbr.solutions",
-      href: "mailto:ulysses.lima@alltechbr.solutions",
-    },
-    {
-      icon: Phone,
-      title: "WhatsApp",
-      value: "(12) 99236-7544",
-      href: "https://wa.me/5512992367544",
-    },
-    {
-      icon: MapPin,
-      title: "Atendimento",
-      value: "Mundial • Seg-Sex: 9h-18h",
-      href: null,
-    },
-  ];
-
-  const benefits = [
-    "✅ Resposta em até 24 horas",
-    "🆓 Diagnóstico gratuito sem compromisso",
-    "🏆 Especialistas Microsoft certificados",
-    "🔄 Metodologia PDCA comprovada",
-    "🌍 Atendimento mundial em português",
-    "🔒 Dados protegidos e seguros",
-  ];
+// Status de segurança
+function SecurityStatus({ csrfReady, attempts }: { csrfReady: boolean; attempts: number }) {
+  if (!csrfReady) {
+    return (
+      <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-2">
+        <Loader2 className="w-4 h-4 animate-spin text-yellow-600" />
+        <div className="text-sm text-yellow-800">
+          <strong>Inicializando proteções...</strong>
+          <p className="text-xs mt-1">Configurando proteção CSRF.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-        Pronto para <span className="text-gradient">migrar</span>?
-      </h2>
-      <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-        Especialistas em migração para Microsoft 365 com metodologia PDCA. 
-        Entre em contato e descubra como modernizar sua infraestrutura 
-        com segurança total e zero downtime.
-      </p>
-
-      {/* Contact Details */}
-      <div className="space-y-6 mb-8">
-        {contactItems.map((item, index) => {
-          const IconComponent = item.icon;
-          const content = (
-            <div className="flex items-center gap-4 group">
-              <div className="w-12 h-12 bg-tech-gradient rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <IconComponent className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 group-hover:text-tech-cyan transition-all duration-300">
-                  {item.title}
-                </h4>
-                <span className="text-gray-600 group-hover:text-tech-cyan transition-colors">
-                  {item.value}
-                </span>
-              </div>
-            </div>
-          );
-
-          return (
-            <div key={index}>
-              {item.href ? (
-                <a href={item.href} className="block" target={item.href.startsWith('https://wa.me') ? '_blank' : undefined} rel={item.href.startsWith('https://wa.me') ? 'noopener noreferrer' : undefined}>
-                  {content}
-                </a>
-              ) : (
-                content
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Benefits */}
-      <div className="p-6 bg-gray-50 rounded-xl tech-border-hover tech-shadow">
-        <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <span className="text-xl">🎯</span>
-          Por que nos escolher?
-        </h4>
-        <ul className="space-y-3 text-sm text-gray-600">
-          {benefits.map((benefit, index) => (
-            <li
-              key={index}
-              className="flex items-center hover:text-gray-800 transition-colors"
-            >
-              <span className="mr-2">{benefit}</span>
-            </li>
-          ))}
-        </ul>
+    <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2">
+      <Shield className="w-4 h-4 text-green-600" />
+      <div className="text-sm text-green-800">
+        <strong>🔒 Formulário protegido</strong>
+        <p className="text-xs mt-1">
+          CSRF, Rate Limiting, Validação
+          {attempts > 0 && ` • Tentativas: ${attempts}/3`}
+        </p>
       </div>
     </div>
   );
 }
 
-// Status Message Component
-function StatusMessage({ status, apiResponse }: { 
+// Mensagens de status
+function StatusMessage({ status, apiResponse, errors }: { 
   status: SubmissionStatus; 
-  apiResponse: ApiResponse | null; 
+  apiResponse: ApiResponse | null;
+  errors: FormErrors;
 }) {
   if (status === 'success' && apiResponse) {
     return (
@@ -431,9 +415,7 @@ function StatusMessage({ status, apiResponse }: {
             <h4 className="font-semibold text-green-800 mb-2">
               🎉 Mensagem enviada com sucesso!
             </h4>
-            <p className="text-green-700 text-sm mb-3">
-              {apiResponse.message}
-            </p>
+            <p className="text-green-700 text-sm mb-3">{apiResponse.message}</p>
             
             {apiResponse.salesRepresentative && (
               <div className="bg-green-100 p-3 rounded-md">
@@ -453,17 +435,16 @@ function StatusMessage({ status, apiResponse }: {
     );
   }
 
-  if (status === 'error') {
+  if (status === 'error' || errors.submission || errors.security) {
     return (
       <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
         <div className="flex items-center">
           <AlertCircle className="w-5 h-5 text-red-500 mr-3" />
           <div>
-            <h4 className="font-semibold text-red-800">
-              Erro ao enviar mensagem
-            </h4>
+            <h4 className="font-semibold text-red-800">Erro ao enviar</h4>
             <p className="text-red-700 text-sm">
-              Tente novamente ou use nosso email diretamente: ulysses.lima@alltechbr.solutions
+              {errors.submission || errors.security || 
+               'Erro interno. Use nosso email: ulysses.lima@alltechbr.solutions'}
             </p>
           </div>
         </div>
@@ -474,66 +455,88 @@ function StatusMessage({ status, apiResponse }: {
   return null;
 }
 
-// Main Component
+// Contact Info
+function ContactInfo() {
+  const contactItems = [
+    {
+      icon: Mail,
+      title: "Email",
+      value: "ulysses.lima@alltechbr.solutions",
+      href: "mailto:ulysses.lima@alltechbr.solutions",
+    },
+    {
+      icon: Phone,
+      title: "WhatsApp", 
+      value: "(12) 99236-7544",
+      href: "https://wa.me/5512992367544",
+    },
+    {
+      icon: MapPin,
+      title: "Atendimento",
+      value: "Mundial • Seg-Sex: 9h-18h",
+      href: null,
+    },
+  ];
+
+  return (
+    <div>
+      <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+        Pronto para <span className="text-gradient">migrar</span>?
+      </h2>
+      <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+        Especialistas em migração para Microsoft 365 com metodologia PDCA.
+      </p>
+
+      <div className="space-y-6 mb-8">
+        {contactItems.map((item, index) => {
+          const IconComponent = item.icon;
+          const content = (
+            <div className="flex items-center gap-4 group">
+              <div className="w-12 h-12 bg-tech-gradient rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <IconComponent className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-900">{item.title}</h4>
+                <span className="text-gray-600">{item.value}</span>
+              </div>
+            </div>
+          );
+
+          return (
+            <div key={index}>
+              {item.href ? (
+                <a href={item.href} className="block" target={item.href.includes('wa.me') ? '_blank' : undefined}>
+                  {content}
+                </a>
+              ) : (
+                content
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Componente principal
 export default function ContactForm() {
-  const { formData, errors, status, apiResponse, updateField, submitForm, setErrors } = useContactForm();
-  const [csrfToken, setCsrfToken] = useState("");
-  const [lgpdConsent, setLgpdConsent] = useState(false);
-  const [lgpdError, setLgpdError] = useState("");
-
-  useEffect(() => {
-    setCsrfToken(
-      Math.random().toString(36).substring(2) + Date.now().toString(36)
-    );
-  }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLgpdError("");
-    const validationErrors = ValidationService.validateForm(formData);
-    let hasError = false;
-    if (!lgpdConsent) {
-      setLgpdError("É necessário aceitar o consentimento de dados (LGPD)");
-      hasError = true;
-    }
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      hasError = true;
-    } else {
-      setErrors({});
-    }
-    if (hasError) return;
-    submitForm(e, csrfToken);
-  };
+  const {
+    formData, errors, status, apiResponse, lgpdConsent, securityInfo,
+    updateField, submitForm, setLgpdConsent,
+  } = useSecureContactForm();
 
   const estadosBrasileiros = [
-    { code: 'AC', name: 'Acre' },
-    { code: 'AL', name: 'Alagoas' },
-    { code: 'AP', name: 'Amapá' },
-    { code: 'AM', name: 'Amazonas' },
-    { code: 'BA', name: 'Bahia' },
-    { code: 'CE', name: 'Ceará' },
-    { code: 'DF', name: 'Distrito Federal' },
-    { code: 'ES', name: 'Espírito Santo' },
-    { code: 'GO', name: 'Goiás' },
-    { code: 'MA', name: 'Maranhão' },
-    { code: 'MT', name: 'Mato Grosso' },
-    { code: 'MS', name: 'Mato Grosso do Sul' },
-    { code: 'MG', name: 'Minas Gerais' },
-    { code: 'PA', name: 'Pará' },
-    { code: 'PB', name: 'Paraíba' },
-    { code: 'PR', name: 'Paraná' },
-    { code: 'PE', name: 'Pernambuco' },
-    { code: 'PI', name: 'Piauí' },
-    { code: 'RJ', name: 'Rio de Janeiro' },
-    { code: 'RN', name: 'Rio Grande do Norte' },
-    { code: 'RS', name: 'Rio Grande do Sul' },
-    { code: 'RO', name: 'Rondônia' },
-    { code: 'RR', name: 'Roraima' },
-    { code: 'SC', name: 'Santa Catarina' },
-    { code: 'SP', name: 'São Paulo' },
-    { code: 'SE', name: 'Sergipe' },
-    { code: 'TO', name: 'Tocantins' }
+    { code: 'AC', name: 'Acre' }, { code: 'AL', name: 'Alagoas' }, { code: 'AP', name: 'Amapá' },
+    { code: 'AM', name: 'Amazonas' }, { code: 'BA', name: 'Bahia' }, { code: 'CE', name: 'Ceará' },
+    { code: 'DF', name: 'Distrito Federal' }, { code: 'ES', name: 'Espírito Santo' },
+    { code: 'GO', name: 'Goiás' }, { code: 'MA', name: 'Maranhão' }, { code: 'MT', name: 'Mato Grosso' },
+    { code: 'MS', name: 'Mato Grosso do Sul' }, { code: 'MG', name: 'Minas Gerais' },
+    { code: 'PA', name: 'Pará' }, { code: 'PB', name: 'Paraíba' }, { code: 'PR', name: 'Paraná' },
+    { code: 'PE', name: 'Pernambuco' }, { code: 'PI', name: 'Piauí' }, { code: 'RJ', name: 'Rio de Janeiro' },
+    { code: 'RN', name: 'Rio Grande do Norte' }, { code: 'RS', name: 'Rio Grande do Sul' },
+    { code: 'RO', name: 'Rondônia' }, { code: 'RR', name: 'Roraima' }, { code: 'SC', name: 'Santa Catarina' },
+    { code: 'SP', name: 'São Paulo' }, { code: 'SE', name: 'Sergipe' }, { code: 'TO', name: 'Tocantins' }
   ];
 
   return (
@@ -543,9 +546,10 @@ export default function ContactForm() {
           <ContactInfo />
 
           <div className="bg-gray-50 rounded-2xl p-8 tech-border-hover tech-shadow">
-            <StatusMessage status={status} apiResponse={apiResponse} />
+            <SecurityStatus csrfReady={securityInfo.csrfReady} attempts={securityInfo.attempts} />
+            <StatusMessage status={status} apiResponse={apiResponse} errors={errors} />
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={submitForm} className="space-y-6">
               {/* Informações Pessoais */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -554,41 +558,25 @@ export default function ContactForm() {
                 </h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <InputField
-                    id="name"
-                    label="Nome Completo"
-                    value={formData.name}
+                    id="name" label="Nome Completo" value={formData.name}
                     onChange={(value) => updateField("name", value)}
-                    error={errors.name}
-                    placeholder="Seu nome completo"
-                    required
-                    maxLength={100}
+                    error={errors.name} placeholder="Seu nome completo"
+                    required maxLength={100}
                   />
-
                   <InputField
-                    id="email"
-                    label="Email"
-                    type="email"
-                    value={formData.email}
+                    id="email" label="Email" type="email" value={formData.email}
                     onChange={(value) => updateField("email", value)}
-                    error={errors.email}
-                    placeholder="seu@email.com"
-                    required
-                    maxLength={255}
+                    error={errors.email} placeholder="seu@email.com"
+                    required maxLength={255}
                   />
                 </div>
-
                 <div className="mt-6">
                   <InputField
-                    id="phone"
-                    label="Telefone"
-                    type="tel"
-                    value={formData.phone}
+                    id="phone" label="Telefone" type="tel" value={formData.phone}
                     onChange={(value) => updateField("phone", value)}
-                    error={errors.phone}
-                    placeholder="(11) 9 9999-9999"
+                    error={errors.phone} placeholder="(11) 9 9999-9999"
                     icon={<Phone className="w-5 h-5 text-tech-cyan" />}
-                    maxLength={15}
-                    required
+                    maxLength={15} required
                   />
                 </div>
               </div>
@@ -601,35 +589,28 @@ export default function ContactForm() {
                 </h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <InputField
-                    id="company"
-                    label="Nome da Empresa"
-                    value={formData.company}
+                    id="company" label="Nome da Empresa" value={formData.company}
                     onChange={(value) => updateField("company", value)}
-                    placeholder="Nome da sua empresa"
-                    maxLength={100}
+                    placeholder="Nome da sua empresa" maxLength={100}
                   />
-
                   <InputField
-                    id="cnpj"
-                    label="CNPJ"
-                    value={formData.cnpj}
+                    id="cnpj" label="CNPJ" value={formData.cnpj}
                     onChange={(value) => updateField("cnpj", value)}
-                    error={errors.cnpj}
-                    placeholder="00.000.000/0000-00"
+                    error={errors.cnpj} placeholder="00.000.000/0000-00"
                     maxLength={18}
                   />
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-6 mt-6">
                   <div>
-                    <label htmlFor="numberOfEmployees" className="block text-sm font-semibold text-gray-700 mb-2 min-h-[40px]">
-                      Número de Funcionários
+                    <label htmlFor="numberOfEmployees" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Funcionários
                     </label>
                     <select
                       id="numberOfEmployees"
                       value={formData.numberOfEmployees}
                       onChange={(e) => updateField("numberOfEmployees", e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg transition-all bg-white focus:ring-2 focus:ring-tech-cyan focus:border-transparent hover:border-tech-cyan/50"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-tech-cyan"
                     >
                       <option value="">Selecione</option>
                       <option value="1-10">1 a 10</option>
@@ -641,14 +622,14 @@ export default function ContactForm() {
                   </div>
 
                   <div>
-                    <label htmlFor="state" className="block text-sm font-semibold text-gray-700 mb-2 min-h-[40px] pt-2">
+                    <label htmlFor="state" className="block text-sm font-semibold text-gray-700 mb-2">
                       Estado
                     </label>
                     <select
                       id="state"
                       value={formData.state}
                       onChange={(e) => updateField("state", e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg transition-all bg-white focus:ring-2 focus:ring-tech-cyan focus:border-transparent hover:border-tech-cyan/50 pt-3"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-tech-cyan"
                     >
                       <option value="">Selecione</option>
                       {estadosBrasileiros.map((estado) => (
@@ -660,82 +641,65 @@ export default function ContactForm() {
                   </div>
 
                   <InputField
-                    id="city"
-                    label="Cidade"
-                    value={formData.city}
+                    id="city" label="Cidade" value={formData.city}
                     onChange={(value) => updateField("city", value)}
-                    placeholder="Sua cidade"
-                    maxLength={50}
-                    labelClassName="min-h-[40px] mb-2 pt-2"
-                    inputClassName="pt-2"
+                    placeholder="Sua cidade" maxLength={50}
                   />
                 </div>
               </div>
 
-              {/* Serviço de Interesse */}
-              <div>
-                <InputField
-                  id="serviceOfInterest"
-                  label="Serviço de Interesse"
-                  type="select"
-                  value={formData.serviceOfInterest}
-                  onChange={(value) => updateField("serviceOfInterest", value)}
-                />
-              </div>
+              {/* Serviço */}
+              <InputField
+                id="serviceOfInterest" label="Serviço de Interesse"
+                type="select" value={formData.serviceOfInterest}
+                onChange={(value) => updateField("serviceOfInterest", value)}
+              />
 
               {/* Mensagem */}
-              <div>
-                <InputField
-                  id="message"
-                  label="Mensagem"
-                  type="textarea"
-                  value={formData.message}
-                  onChange={(value) => updateField("message", value)}
-                  error={errors.message}
-                  placeholder="Conte-nos sobre seu projeto de migração, número de usuários, sistemas atuais (Google Workspace, Slack, etc.) e urgência do projeto..."
-                  required
-                  maxLength={1000}
-                />
-                <div className="mt-1 text-xs text-gray-500 text-right">
-                  {formData.message.length}/1000 caracteres
-                </div>
-              </div>
+              <InputField
+                id="message" label="Mensagem" type="textarea" value={formData.message}
+                onChange={(value) => updateField("message", value)}
+                error={errors.message}
+                placeholder="Conte sobre seu projeto, número de usuários, sistemas atuais..."
+                required maxLength={1000}
+              />
 
-              {/* Checkbox LGPD obrigatório */}
-              <div className="flex items-start gap-2 pt-2">
+              {/* LGPD */}
+              <div className="flex items-start gap-2">
                 <input
-                  id="lgpdConsent"
-                  type="checkbox"
+                  id="lgpdConsent" type="checkbox" 
                   checked={lgpdConsent}
                   onChange={e => setLgpdConsent(e.target.checked)}
-                  required
-                  className="mt-1"
+                  required className="mt-1"
                 />
                 <label htmlFor="lgpdConsent" className="text-sm text-gray-700">
-                  Concordo com a coleta e uso dos meus dados conforme a <a href="/politica-de-privacidade" target="_blank" rel="noopener noreferrer" className="underline text-tech-cyan">Política de Privacidade</a>.
+                  Concordo com a <a href="/politica-de-privacidade" target="_blank" className="underline text-tech-cyan">Política de Privacidade</a>.
                 </label>
               </div>
-              {lgpdError && (
-                <p className="text-red-600 text-sm mt-2 font-semibold" role="alert">{lgpdError}</p>
+              {errors.lgpd && (
+                <p className="text-red-600 text-sm font-semibold">{errors.lgpd}</p>
               )}
 
-              {/* Botão de Envio */}
+              {/* Botão */}
               <div className="pt-4">
                 <button
                   type="submit"
-                  disabled={status === 'submitting'}
-                  className={`
-                    w-full btn-primary text-lg py-4 transition-all duration-300 relative overflow-hidden
-                    ${status === 'submitting' 
+                  disabled={!securityInfo.csrfReady || status === 'submitting'}
+                  className={`w-full btn-primary text-lg py-4 transition-all duration-300 ${
+                    !securityInfo.csrfReady || status === 'submitting'
                       ? 'opacity-70 cursor-not-allowed' 
                       : 'animate-gradient hover:scale-105'
-                    }
-                  `}
+                  }`}
                 >
                   {status === 'submitting' ? (
                     <span className="flex items-center justify-center gap-3">
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Enviando sua mensagem...
+                      Enviando...
+                    </span>
+                  ) : !securityInfo.csrfReady ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Shield className="w-5 h-5" />
+                      Carregando...
                     </span>
                   ) : (
                     <span className="flex items-center justify-center gap-2">
@@ -746,27 +710,13 @@ export default function ContactForm() {
                 </button>
               </div>
 
-              {/* Política de Privacidade */}
+              {/* Info de segurança */}
               <div className="text-center">
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  🔒 Ao enviar este formulário, você concorda com nossa política de privacidade.<br />
-                  Seus dados serão utilizados apenas para entrarmos em contato e são protegidos com criptografia.
+                <p className="text-xs text-gray-500">
+                  🔒 Formulário protegido por CSRF e Rate Limiting.<br />
+                  Dados protegidos conforme LGPD.
                 </p>
               </div>
-
-              {/* Informações Adicionais */}
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
-                  💡 Dica para uma resposta mais rápida
-                </h4>
-                <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Mencione se usa Google Workspace, Slack ou outro tenant Microsoft</li>
-                  <li>• Descreva o número aproximado de usuários a migrar</li>
-                  <li>• Indique se há urgência no projeto de migração</li>
-                  <li>• Mencione se já tentou migrar anteriormente</li>
-                </ul>
-              </div>
-              <input type="hidden" name="csrfToken" value={csrfToken} />
             </form>
           </div>
         </div>
