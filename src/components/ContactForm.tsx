@@ -1,4 +1,4 @@
-// src/components/ContactForm.tsx - SUBSTITUIR ARQUIVO COMPLETO
+// src/components/ContactForm.tsx - ATUALIZADO COM SERVIÇO OBRIGATÓRIO
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
@@ -14,7 +14,7 @@ interface ContactFormData {
   numberOfEmployees: string;
   state: string;
   city: string;
-  serviceOfInterest: string;
+  serviceOfInterest: string; // AGORA OBRIGATÓRIO
   message: string;
 }
 
@@ -180,7 +180,7 @@ function useSecureContactForm() {
       return;
     }
 
-    // Validações básicas
+    // Validações básicas - INCLUINDO SERVIÇO OBRIGATÓRIO
     const basicErrors: FormErrors = {};
     
     if (!formData.name.trim()) {
@@ -191,6 +191,11 @@ function useSecureContactForm() {
     
     if (!formData.email.trim()) {
       basicErrors.email = 'Email é obrigatório';
+    }
+
+    // VALIDAÇÃO OBRIGATÓRIA DO SERVIÇO
+    if (!formData.serviceOfInterest.trim()) {
+      basicErrors.serviceOfInterest = 'Serviço de interesse é obrigatório';
     }
     
     if (!formData.message.trim()) {
@@ -303,10 +308,11 @@ interface InputFieldProps {
   required?: boolean;
   icon?: React.ReactNode;
   maxLength?: number;
+  options?: { value: string; label: string }[]; // Para select
 }
 
 function InputField({
-  id, label, type = "text", value, onChange, error, placeholder, required = false, icon, maxLength
+  id, label, type = "text", value, onChange, error, placeholder, required = false, icon, maxLength, options
 }: InputFieldProps) {
   const inputClass = [
     "w-full px-4 py-3 border rounded-lg transition-all bg-white",
@@ -344,12 +350,20 @@ function InputField({
             className={inputClass}
           >
             <option value="">Selecione um serviço</option>
-            <option value="Migração para Microsoft 365">Migração para Microsoft 365</option>
-            <option value="Treinamentos Microsoft">Treinamentos Microsoft</option>
-            <option value="Consultoria em Cloud">Consultoria em Cloud</option>
-            <option value="Automação de Processos">Automação de Processos</option>
-            <option value="Diagnóstico Gratuito">Diagnóstico Gratuito</option>
-            <option value="Outros">Outros</option>
+            {options?.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            )) || (
+              <>
+                <option value="Migração para Microsoft 365">Migração para Microsoft 365</option>
+                <option value="Treinamentos Microsoft">Treinamentos Microsoft</option>
+                <option value="Consultoria em Cloud">Consultoria em Cloud</option>
+                <option value="Automação de Processos">Automação de Processos</option>
+                <option value="Diagnóstico Gratuito">Diagnóstico Gratuito</option>
+                <option value="Outros">Outros</option>
+              </>
+            )}
           </select>
         ) : (
           <input
@@ -576,9 +590,25 @@ export default function ContactForm() {
                     onChange={(value) => updateField("phone", value)}
                     error={errors.phone} placeholder="(11) 9 9999-9999"
                     icon={<Phone className="w-5 h-5 text-tech-cyan" />}
-                    maxLength={15} required
+                    maxLength={15}
                   />
                 </div>
+              </div>
+
+              {/* Serviço de Interesse - AGORA OBRIGATÓRIO */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  Serviço de Interesse
+                </h3>
+                <InputField
+                  id="serviceOfInterest" 
+                  label="Qual serviço você precisa?" 
+                  type="select" 
+                  value={formData.serviceOfInterest}
+                  onChange={(value) => updateField("serviceOfInterest", value)}
+                  error={errors.serviceOfInterest}
+                  required
+                />
               </div>
 
               {/* Informações da Empresa */}
@@ -648,13 +678,6 @@ export default function ContactForm() {
                 </div>
               </div>
 
-              {/* Serviço */}
-              <InputField
-                id="serviceOfInterest" label="Serviço de Interesse"
-                type="select" value={formData.serviceOfInterest}
-                onChange={(value) => updateField("serviceOfInterest", value)}
-              />
-
               {/* Mensagem */}
               <InputField
                 id="message" label="Mensagem" type="textarea" value={formData.message}
@@ -679,6 +702,13 @@ export default function ContactForm() {
               {errors.lgpd && (
                 <p className="text-red-600 text-sm font-semibold">{errors.lgpd}</p>
               )}
+
+              {/* Indicador de campos obrigatórios */}
+              <div className="text-center">
+                <p className="text-xs text-gray-500">
+                  <span className="text-red-600">*</span> Campos obrigatórios
+                </p>
+              </div>
 
               {/* Botão */}
               <div className="pt-4">

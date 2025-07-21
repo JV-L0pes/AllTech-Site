@@ -1,4 +1,4 @@
-// src/lib/validations.ts - VERSÃO CORRIGIDA
+// src/lib/validations.ts - ATUALIZADO COM SERVIÇO OBRIGATÓRIO
 import { z } from 'zod';
 
 // Regex patterns mais robustos
@@ -93,7 +93,7 @@ export const VALID_STATES = [
   'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
 ] as const;
 
-// Serviços válidos
+// Serviços válidos - AGORA OBRIGATÓRIO
 const VALID_SERVICES = [
   'Migração para Microsoft 365',
   'Treinamentos Microsoft', 
@@ -105,7 +105,7 @@ const VALID_SERVICES = [
 
 /**
  * Schema principal de validação
- * Aplicando princípios DDD: Domain-driven validation
+ * SERVIÇO DE INTERESSE AGORA É OBRIGATÓRIO
  */
 export const contactFormSchema = z.object({
   // Dados pessoais obrigatórios
@@ -131,6 +131,15 @@ export const contactFormSchema = z.object({
       'Formato de email inválido'
     )
     .transform((email) => email.toLowerCase().trim()),
+  
+  // SERVIÇO DE INTERESSE - AGORA OBRIGATÓRIO
+  serviceOfInterest: z
+    .string()
+    .min(1, 'Serviço de interesse é obrigatório')
+    .refine(
+      (service) => VALID_SERVICES.includes(service as any),
+      'Selecione um serviço válido'
+    ),
   
   // Dados opcionais com validação condicional
   phone: z
@@ -196,15 +205,6 @@ export const contactFormSchema = z.object({
       'Nome da cidade deve ter entre 2 e 50 caracteres'
     ),
   
-  serviceOfInterest: z
-    .string()
-    .default('')
-    .transform((service) => service?.trim() || '')
-    .refine(
-      (service) => service === '' || VALID_SERVICES.includes(service as any),
-      'Serviço de interesse inválido'
-    ),
-  
   // Mensagem obrigatória
   message: z
     .string()
@@ -222,10 +222,10 @@ export type ContactFormData = z.infer<typeof contactFormSchema>;
 export const contactFormSchemaSimplified = z.object({
   name: contactFormSchema.shape.name,
   email: contactFormSchema.shape.email,
+  serviceOfInterest: contactFormSchema.shape.serviceOfInterest, // AGORA OBRIGATÓRIO
   message: contactFormSchema.shape.message,
   company: contactFormSchema.shape.company,
   phone: contactFormSchema.shape.phone,
-  serviceOfInterest: contactFormSchema.shape.serviceOfInterest
 });
 
 export type ContactFormDataSimplified = z.infer<typeof contactFormSchemaSimplified>;
@@ -425,6 +425,9 @@ export function validateContactForm(data: unknown): {
         // Melhorar mensagens de erro para o usuário
         if (issue.path.includes('cnpj')) {
           return 'CNPJ inválido. Verifique os dígitos ou deixe em branco se não tiver empresa';
+        }
+        if (issue.path.includes('serviceOfInterest')) {
+          return 'Por favor, selecione um serviço de interesse';
         }
         return issue.message;
       });
