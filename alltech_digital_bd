@@ -1,0 +1,1049 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 17.5
+-- Dumped by pg_dump version 17.5
+
+-- Started on 2025-07-19 13:09:56
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 3 (class 3079 OID 16905)
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- TOC entry 5145 (class 0 OID 0)
+-- Dependencies: 3
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
+--
+-- TOC entry 4 (class 3079 OID 17236)
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+
+--
+-- TOC entry 5146 (class 0 OID 0)
+-- Dependencies: 4
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
+
+--
+-- TOC entry 2 (class 3079 OID 16894)
+-- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+
+
+--
+-- TOC entry 5147 (class 0 OID 0)
+-- Dependencies: 2
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
+
+
+--
+-- TOC entry 944 (class 1247 OID 17004)
+-- Name: lead_source; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.lead_source AS ENUM (
+    'website_contact_form',
+    'website_chat',
+    'linkedin',
+    'email_marketing',
+    'referral',
+    'cold_call',
+    'event',
+    'organic_search',
+    'paid_ads',
+    'other'
+);
+
+
+ALTER TYPE public.lead_source OWNER TO postgres;
+
+--
+-- TOC entry 941 (class 1247 OID 16987)
+-- Name: lead_status; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.lead_status AS ENUM (
+    'new',
+    'contacted',
+    'qualified',
+    'proposal_sent',
+    'negotiating',
+    'won',
+    'lost',
+    'unqualified'
+);
+
+
+ALTER TYPE public.lead_status OWNER TO postgres;
+
+--
+-- TOC entry 321 (class 1255 OID 17188)
+-- Name: get_sales_rep_by_state(character varying); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.get_sales_rep_by_state(state_code character varying) RETURNS TABLE(id uuid, name character varying, email character varying, phone character varying, region character varying)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT sr.id, sr.name, sr.email, sr.phone, sr.region
+    FROM sales_representatives sr
+    WHERE state_code = ANY(sr.states)
+    AND sr.is_active = TRUE
+    LIMIT 1;
+END;
+$$;
+
+
+ALTER FUNCTION public.get_sales_rep_by_state(state_code character varying) OWNER TO postgres;
+
+--
+-- TOC entry 274 (class 1255 OID 17180)
+-- Name: update_updated_at_column(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.update_updated_at_column() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.update_updated_at_column() OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 221 (class 1259 OID 17038)
+-- Name: companies; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.companies (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    name character varying(255) NOT NULL,
+    cnpj character varying(18),
+    number_of_employees character varying(20) NOT NULL,
+    industry character varying(100),
+    website character varying(255),
+    state character varying(2) NOT NULL,
+    city character varying(100) NOT NULL,
+    address text,
+    postal_code character varying(10),
+    annual_revenue numeric(15,2),
+    is_active boolean DEFAULT true,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.companies OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 17051)
+-- Name: contacts; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.contacts (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    company_id uuid NOT NULL,
+    name character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    phone character varying(20),
+    "position" character varying(100),
+    department character varying(100),
+    is_primary boolean DEFAULT false,
+    is_active boolean DEFAULT true,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.contacts OWNER TO postgres;
+
+--
+-- TOC entry 224 (class 1259 OID 17096)
+-- Name: interactions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.interactions (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    lead_id uuid NOT NULL,
+    sales_rep_id uuid NOT NULL,
+    interaction_type character varying(50) NOT NULL,
+    subject character varying(255),
+    description text,
+    interaction_date timestamp with time zone NOT NULL,
+    duration_minutes integer,
+    outcome character varying(100),
+    next_action character varying(255),
+    next_action_date date,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.interactions OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 17068)
+-- Name: leads; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.leads (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    company_id uuid NOT NULL,
+    contact_id uuid NOT NULL,
+    sales_rep_id uuid NOT NULL,
+    service_of_interest character varying(100),
+    message text,
+    status public.lead_status DEFAULT 'new'::public.lead_status,
+    source public.lead_source DEFAULT 'website_contact_form'::public.lead_source,
+    priority integer DEFAULT 3,
+    estimated_value numeric(10,2),
+    expected_close_date date,
+    notes text,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.leads OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 17025)
+-- Name: sales_representatives; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.sales_representatives (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    name character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    phone character varying(20),
+    region character varying(100) NOT NULL,
+    states text[] NOT NULL,
+    is_active boolean DEFAULT true,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.sales_representatives OWNER TO postgres;
+
+--
+-- TOC entry 230 (class 1259 OID 17278)
+-- Name: leads_complete; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.leads_complete AS
+ SELECT l.id AS lead_id,
+    l.status,
+    l.source,
+    l.priority,
+    l.service_of_interest,
+    l.message,
+    l.estimated_value,
+    l.expected_close_date,
+    l.created_at AS lead_created_at,
+    c.name AS company_name,
+    c.cnpj,
+    c.state AS company_state,
+    c.city AS company_city,
+    c.number_of_employees,
+    ct.name AS contact_name,
+    ct.email AS contact_email,
+    ct.phone AS contact_phone,
+    ct."position" AS contact_position,
+    sr.name AS sales_rep_name,
+    sr.email AS sales_rep_email,
+    sr.region AS sales_rep_region
+   FROM (((public.leads l
+     JOIN public.companies c ON ((l.company_id = c.id)))
+     JOIN public.contacts ct ON ((l.contact_id = ct.id)))
+     JOIN public.sales_representatives sr ON ((l.sales_rep_id = sr.id)));
+
+
+ALTER VIEW public.leads_complete OWNER TO postgres;
+
+--
+-- TOC entry 228 (class 1259 OID 17189)
+-- Name: leads_with_details; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.leads_with_details AS
+ SELECT l.id,
+    l.status,
+    l.source,
+    l.service_of_interest,
+    l.priority,
+    l.estimated_value,
+    l.created_at,
+    c.name AS company_name,
+    c.cnpj,
+    c.number_of_employees,
+    c.state,
+    c.city,
+    ct.name AS contact_name,
+    ct.email AS contact_email,
+    ct.phone AS contact_phone,
+    sr.name AS sales_rep_name,
+    sr.email AS sales_rep_email,
+    sr.region
+   FROM (((public.leads l
+     JOIN public.companies c ON ((l.company_id = c.id)))
+     JOIN public.contacts ct ON ((l.contact_id = ct.id)))
+     JOIN public.sales_representatives sr ON ((l.sales_rep_id = sr.id)));
+
+
+ALTER VIEW public.leads_with_details OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 17146)
+-- Name: proposal_items; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.proposal_items (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    proposal_id uuid NOT NULL,
+    service_id uuid,
+    description text NOT NULL,
+    quantity integer DEFAULT 1 NOT NULL,
+    unit_price numeric(10,2) NOT NULL,
+    total_price numeric(10,2) NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.proposal_items OWNER TO postgres;
+
+--
+-- TOC entry 226 (class 1259 OID 17127)
+-- Name: proposals; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.proposals (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    lead_id uuid NOT NULL,
+    proposal_number character varying(50) NOT NULL,
+    title character varying(255) NOT NULL,
+    description text,
+    total_value numeric(12,2) NOT NULL,
+    discount_percentage numeric(5,2) DEFAULT 0,
+    final_value numeric(12,2) NOT NULL,
+    valid_until date,
+    status character varying(50) DEFAULT 'draft'::character varying,
+    sent_at timestamp with time zone,
+    viewed_at timestamp with time zone,
+    responded_at timestamp with time zone,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.proposals OWNER TO postgres;
+
+--
+-- TOC entry 231 (class 1259 OID 17283)
+-- Name: sales_dashboard; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.sales_dashboard AS
+ SELECT sr.name AS sales_rep,
+    sr.region,
+    count(l.id) AS total_leads,
+    count(
+        CASE
+            WHEN (l.status = 'new'::public.lead_status) THEN 1
+            ELSE NULL::integer
+        END) AS new_leads,
+    count(
+        CASE
+            WHEN (l.status = 'qualified'::public.lead_status) THEN 1
+            ELSE NULL::integer
+        END) AS qualified_leads,
+    count(
+        CASE
+            WHEN (l.status = 'won'::public.lead_status) THEN 1
+            ELSE NULL::integer
+        END) AS won_leads,
+    sum(
+        CASE
+            WHEN (l.status = 'won'::public.lead_status) THEN l.estimated_value
+            ELSE (0)::numeric
+        END) AS total_revenue
+   FROM (public.sales_representatives sr
+     LEFT JOIN public.leads l ON ((sr.id = l.sales_rep_id)))
+  WHERE (sr.is_active = true)
+  GROUP BY sr.id, sr.name, sr.region
+  ORDER BY (count(l.id)) DESC;
+
+
+ALTER VIEW public.sales_dashboard OWNER TO postgres;
+
+--
+-- TOC entry 229 (class 1259 OID 17194)
+-- Name: sales_performance; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.sales_performance AS
+ SELECT sr.name AS sales_rep_name,
+    sr.region,
+    count(l.id) AS total_leads,
+    count(
+        CASE
+            WHEN (l.status = 'won'::public.lead_status) THEN 1
+            ELSE NULL::integer
+        END) AS won_leads,
+    count(
+        CASE
+            WHEN (l.status = 'lost'::public.lead_status) THEN 1
+            ELSE NULL::integer
+        END) AS lost_leads,
+    round((((count(
+        CASE
+            WHEN (l.status = 'won'::public.lead_status) THEN 1
+            ELSE NULL::integer
+        END))::numeric * 100.0) / (NULLIF(count(l.id), 0))::numeric), 2) AS win_rate,
+    COALESCE(sum(
+        CASE
+            WHEN (l.status = 'won'::public.lead_status) THEN l.estimated_value
+            ELSE NULL::numeric
+        END), (0)::numeric) AS total_revenue
+   FROM (public.sales_representatives sr
+     LEFT JOIN public.leads l ON ((sr.id = l.sales_rep_id)))
+  GROUP BY sr.id, sr.name, sr.region;
+
+
+ALTER VIEW public.sales_performance OWNER TO postgres;
+
+--
+-- TOC entry 225 (class 1259 OID 17116)
+-- Name: services; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.services (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    name character varying(255) NOT NULL,
+    description text,
+    category character varying(100),
+    base_price numeric(10,2),
+    is_active boolean DEFAULT true,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.services OWNER TO postgres;
+
+--
+-- TOC entry 5133 (class 0 OID 17038)
+-- Dependencies: 221
+-- Data for Name: companies; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.companies VALUES ('3e81cc68-4922-40a8-b570-1204a986648e', 'TesteDomainAutenticado', '11.222.333/0001-81', '11-50', NULL, NULL, 'SP', 'São Paulo', NULL, NULL, NULL, true, '2025-07-19 10:04:21.228593-03', '2025-07-19 10:04:21.228593-03');
+
+
+--
+-- TOC entry 5134 (class 0 OID 17051)
+-- Dependencies: 222
+-- Data for Name: contacts; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.contacts VALUES ('a8d42fa3-31ef-40e8-942a-ab9ccb67ee6a', '3e81cc68-4922-40a8-b570-1204a986648e', 'Teste Domain Autenticado', 'joaovlr9@gmail.com', '(11) 98765-4321', NULL, NULL, true, true, '2025-07-19 10:04:21.228593-03', '2025-07-19 10:04:21.228593-03');
+
+
+--
+-- TOC entry 5136 (class 0 OID 17096)
+-- Dependencies: 224
+-- Data for Name: interactions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.interactions VALUES ('cad7f228-e913-4b9e-89df-03b6d4cad584', 'c2679713-4559-4871-affe-cf5e7f476d2c', '2909ba2c-c9d2-4d29-87e4-8c7c6abcde47', 'form_submission', 'Novo contato via site', 'Lead gerado através do formulário de contato do site', '2025-07-19 10:04:21.228593-03', NULL, NULL, NULL, NULL, '2025-07-19 10:04:21.228593-03', '2025-07-19 10:04:21.228593-03');
+
+
+--
+-- TOC entry 5135 (class 0 OID 17068)
+-- Dependencies: 223
+-- Data for Name: leads; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.leads VALUES ('c2679713-4559-4871-affe-cf5e7f476d2c', '3e81cc68-4922-40a8-b570-1204a986648e', 'a8d42fa3-31ef-40e8-942a-ab9ccb67ee6a', '2909ba2c-c9d2-4d29-87e4-8c7c6abcde47', 'Cloud Service', 'Estamos interessados em migrar nossa infraestrutura para a nuvem Azure e gostaríamos de agendar uma reunião.', 'new', 'website_contact_form', 2, NULL, NULL, NULL, '2025-07-19 10:04:21.228593-03', '2025-07-19 10:04:21.228593-03');
+
+
+--
+-- TOC entry 5139 (class 0 OID 17146)
+-- Dependencies: 227
+-- Data for Name: proposal_items; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- TOC entry 5138 (class 0 OID 17127)
+-- Dependencies: 226
+-- Data for Name: proposals; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- TOC entry 5132 (class 0 OID 17025)
+-- Dependencies: 220
+-- Data for Name: sales_representatives; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.sales_representatives VALUES ('2909ba2c-c9d2-4d29-87e4-8c7c6abcde47', 'João Victor Lopes Rosa', 'joao.rosa@alltechbr.solutions', '(12) 99227-8428', 'Nacional', '{SP,RJ,MG,ES,RS,SC,PR,GO,MT,MS,DF,BA,SE,AL,PE,PB,RN,CE,PI,MA,AC,RO,AM,RR,PA,AP,TO}', true, '2025-07-18 09:59:45.758333-03', '2025-07-18 09:59:45.758333-03');
+
+
+--
+-- TOC entry 5137 (class 0 OID 17116)
+-- Dependencies: 225
+-- Data for Name: services; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.services VALUES ('a82484d3-7606-41a4-9cf1-fe88d17bae3b', 'Implementação de Software', 'Desenvolvimento e implementação de soluções personalizadas', 'Desenvolvimento', 15000.00, true, '2025-07-18 07:46:14.893959-03', '2025-07-18 07:46:14.893959-03');
+INSERT INTO public.services VALUES ('c9eaf85b-a3d3-4b80-aa52-2dcc9e8adb33', 'Treinamentos Microsoft', 'Capacitação especializada em tecnologias Microsoft', 'Treinamento', 3500.00, true, '2025-07-18 07:46:14.893959-03', '2025-07-18 07:46:14.893959-03');
+INSERT INTO public.services VALUES ('62c136ef-b2f4-4eb6-8c0c-bc35273aa91a', 'Cloud Service', 'Migração e otimização de infraestrutura na nuvem', 'Infraestrutura', 8000.00, true, '2025-07-18 07:46:14.893959-03', '2025-07-18 07:46:14.893959-03');
+INSERT INTO public.services VALUES ('62342bbb-2eab-4387-aa13-ea51ede3d0d2', 'Inteligência Artificial', 'Implementação de soluções de IA e automação', 'IA/Automação', 25000.00, true, '2025-07-18 07:46:14.893959-03', '2025-07-18 07:46:14.893959-03');
+INSERT INTO public.services VALUES ('43ff44a1-2749-4be6-ab6b-bdffd9909bbb', 'Diagnóstico Gratuito', 'Avaliação completa da infraestrutura tecnológica', 'Consultoria', 0.00, true, '2025-07-18 07:46:14.893959-03', '2025-07-18 07:46:14.893959-03');
+INSERT INTO public.services VALUES ('756d509e-29e0-457d-9d99-d704f0789f15', 'Consultoria Estratégica', 'Planejamento estratégico em tecnologia', 'Consultoria', 5000.00, true, '2025-07-18 07:46:14.893959-03', '2025-07-18 07:46:14.893959-03');
+
+
+--
+-- TOC entry 4932 (class 2606 OID 17050)
+-- Name: companies companies_cnpj_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.companies
+    ADD CONSTRAINT companies_cnpj_key UNIQUE (cnpj);
+
+
+--
+-- TOC entry 4934 (class 2606 OID 17048)
+-- Name: companies companies_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.companies
+    ADD CONSTRAINT companies_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4940 (class 2606 OID 17062)
+-- Name: contacts contacts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.contacts
+    ADD CONSTRAINT contacts_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4957 (class 2606 OID 17105)
+-- Name: interactions interactions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.interactions
+    ADD CONSTRAINT interactions_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4952 (class 2606 OID 17080)
+-- Name: leads leads_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.leads
+    ADD CONSTRAINT leads_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4966 (class 2606 OID 17155)
+-- Name: proposal_items proposal_items_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.proposal_items
+    ADD CONSTRAINT proposal_items_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4962 (class 2606 OID 17138)
+-- Name: proposals proposals_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.proposals
+    ADD CONSTRAINT proposals_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4964 (class 2606 OID 17140)
+-- Name: proposals proposals_proposal_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.proposals
+    ADD CONSTRAINT proposals_proposal_number_key UNIQUE (proposal_number);
+
+
+--
+-- TOC entry 4928 (class 2606 OID 17037)
+-- Name: sales_representatives sales_representatives_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sales_representatives
+    ADD CONSTRAINT sales_representatives_email_key UNIQUE (email);
+
+
+--
+-- TOC entry 4930 (class 2606 OID 17035)
+-- Name: sales_representatives sales_representatives_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sales_representatives
+    ADD CONSTRAINT sales_representatives_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4959 (class 2606 OID 17126)
+-- Name: services services_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.services
+    ADD CONSTRAINT services_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4935 (class 1259 OID 17273)
+-- Name: idx_companies_active; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_companies_active ON public.companies USING btree (is_active);
+
+
+--
+-- TOC entry 4936 (class 1259 OID 17166)
+-- Name: idx_companies_cnpj; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_companies_cnpj ON public.companies USING btree (cnpj);
+
+
+--
+-- TOC entry 4937 (class 1259 OID 17178)
+-- Name: idx_companies_name_trgm; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_companies_name_trgm ON public.companies USING gin (name public.gin_trgm_ops);
+
+
+--
+-- TOC entry 4938 (class 1259 OID 17167)
+-- Name: idx_companies_state; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_companies_state ON public.companies USING btree (state);
+
+
+--
+-- TOC entry 4941 (class 1259 OID 17168)
+-- Name: idx_contacts_company_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_contacts_company_id ON public.contacts USING btree (company_id);
+
+
+--
+-- TOC entry 4942 (class 1259 OID 17169)
+-- Name: idx_contacts_email; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_contacts_email ON public.contacts USING btree (email);
+
+
+--
+-- TOC entry 4943 (class 1259 OID 17179)
+-- Name: idx_contacts_name_trgm; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_contacts_name_trgm ON public.contacts USING gin (name public.gin_trgm_ops);
+
+
+--
+-- TOC entry 4944 (class 1259 OID 17274)
+-- Name: idx_contacts_primary; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_contacts_primary ON public.contacts USING btree (is_primary) WHERE (is_primary = true);
+
+
+--
+-- TOC entry 4953 (class 1259 OID 17175)
+-- Name: idx_interactions_date; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_interactions_date ON public.interactions USING btree (interaction_date);
+
+
+--
+-- TOC entry 4954 (class 1259 OID 17174)
+-- Name: idx_interactions_lead_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_interactions_lead_id ON public.interactions USING btree (lead_id);
+
+
+--
+-- TOC entry 4955 (class 1259 OID 17277)
+-- Name: idx_interactions_sales_rep_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_interactions_sales_rep_id ON public.interactions USING btree (sales_rep_id);
+
+
+--
+-- TOC entry 4945 (class 1259 OID 17170)
+-- Name: idx_leads_company_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_leads_company_id ON public.leads USING btree (company_id);
+
+
+--
+-- TOC entry 4946 (class 1259 OID 17275)
+-- Name: idx_leads_contact_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_leads_contact_id ON public.leads USING btree (contact_id);
+
+
+--
+-- TOC entry 4947 (class 1259 OID 17173)
+-- Name: idx_leads_created_at; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_leads_created_at ON public.leads USING btree (created_at);
+
+
+--
+-- TOC entry 4948 (class 1259 OID 17171)
+-- Name: idx_leads_sales_rep_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_leads_sales_rep_id ON public.leads USING btree (sales_rep_id);
+
+
+--
+-- TOC entry 4949 (class 1259 OID 17276)
+-- Name: idx_leads_source; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_leads_source ON public.leads USING btree (source);
+
+
+--
+-- TOC entry 4950 (class 1259 OID 17172)
+-- Name: idx_leads_status; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_leads_status ON public.leads USING btree (status);
+
+
+--
+-- TOC entry 4960 (class 1259 OID 17176)
+-- Name: idx_proposals_lead_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_proposals_lead_id ON public.proposals USING btree (lead_id);
+
+
+--
+-- TOC entry 4926 (class 1259 OID 17177)
+-- Name: idx_sales_reps_states; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_sales_reps_states ON public.sales_representatives USING gin (states);
+
+
+--
+-- TOC entry 4977 (class 2620 OID 17182)
+-- Name: companies update_companies_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER update_companies_updated_at BEFORE UPDATE ON public.companies FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+
+--
+-- TOC entry 4978 (class 2620 OID 17183)
+-- Name: contacts update_contacts_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER update_contacts_updated_at BEFORE UPDATE ON public.contacts FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+
+--
+-- TOC entry 4980 (class 2620 OID 17185)
+-- Name: interactions update_interactions_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER update_interactions_updated_at BEFORE UPDATE ON public.interactions FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+
+--
+-- TOC entry 4979 (class 2620 OID 17184)
+-- Name: leads update_leads_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER update_leads_updated_at BEFORE UPDATE ON public.leads FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+
+--
+-- TOC entry 4982 (class 2620 OID 17187)
+-- Name: proposals update_proposals_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER update_proposals_updated_at BEFORE UPDATE ON public.proposals FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+
+--
+-- TOC entry 4976 (class 2620 OID 17181)
+-- Name: sales_representatives update_sales_representatives_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER update_sales_representatives_updated_at BEFORE UPDATE ON public.sales_representatives FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+
+--
+-- TOC entry 4981 (class 2620 OID 17186)
+-- Name: services update_services_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER update_services_updated_at BEFORE UPDATE ON public.services FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+
+--
+-- TOC entry 4967 (class 2606 OID 17063)
+-- Name: contacts contacts_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.contacts
+    ADD CONSTRAINT contacts_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4971 (class 2606 OID 17106)
+-- Name: interactions interactions_lead_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.interactions
+    ADD CONSTRAINT interactions_lead_id_fkey FOREIGN KEY (lead_id) REFERENCES public.leads(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4972 (class 2606 OID 17111)
+-- Name: interactions interactions_sales_rep_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.interactions
+    ADD CONSTRAINT interactions_sales_rep_id_fkey FOREIGN KEY (sales_rep_id) REFERENCES public.sales_representatives(id);
+
+
+--
+-- TOC entry 4968 (class 2606 OID 17081)
+-- Name: leads leads_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.leads
+    ADD CONSTRAINT leads_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4969 (class 2606 OID 17086)
+-- Name: leads leads_contact_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.leads
+    ADD CONSTRAINT leads_contact_id_fkey FOREIGN KEY (contact_id) REFERENCES public.contacts(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4970 (class 2606 OID 17091)
+-- Name: leads leads_sales_rep_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.leads
+    ADD CONSTRAINT leads_sales_rep_id_fkey FOREIGN KEY (sales_rep_id) REFERENCES public.sales_representatives(id);
+
+
+--
+-- TOC entry 4974 (class 2606 OID 17156)
+-- Name: proposal_items proposal_items_proposal_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.proposal_items
+    ADD CONSTRAINT proposal_items_proposal_id_fkey FOREIGN KEY (proposal_id) REFERENCES public.proposals(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4975 (class 2606 OID 17161)
+-- Name: proposal_items proposal_items_service_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.proposal_items
+    ADD CONSTRAINT proposal_items_service_id_fkey FOREIGN KEY (service_id) REFERENCES public.services(id);
+
+
+--
+-- TOC entry 4973 (class 2606 OID 17141)
+-- Name: proposals proposals_lead_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.proposals
+    ADD CONSTRAINT proposals_lead_id_fkey FOREIGN KEY (lead_id) REFERENCES public.leads(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 5148 (class 0 OID 0)
+-- Dependencies: 321
+-- Name: FUNCTION get_sales_rep_by_state(state_code character varying); Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION public.get_sales_rep_by_state(state_code character varying) TO alltech_user;
+
+
+--
+-- TOC entry 5149 (class 0 OID 0)
+-- Dependencies: 274
+-- Name: FUNCTION update_updated_at_column(); Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION public.update_updated_at_column() TO alltech_user;
+
+
+--
+-- TOC entry 5150 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: TABLE companies; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.companies TO alltech_user;
+
+
+--
+-- TOC entry 5151 (class 0 OID 0)
+-- Dependencies: 222
+-- Name: TABLE contacts; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.contacts TO alltech_user;
+
+
+--
+-- TOC entry 5152 (class 0 OID 0)
+-- Dependencies: 224
+-- Name: TABLE interactions; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.interactions TO alltech_user;
+
+
+--
+-- TOC entry 5153 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: TABLE leads; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.leads TO alltech_user;
+
+
+--
+-- TOC entry 5154 (class 0 OID 0)
+-- Dependencies: 220
+-- Name: TABLE sales_representatives; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.sales_representatives TO alltech_user;
+
+
+--
+-- TOC entry 5155 (class 0 OID 0)
+-- Dependencies: 230
+-- Name: TABLE leads_complete; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT ON TABLE public.leads_complete TO alltech_user;
+
+
+--
+-- TOC entry 5156 (class 0 OID 0)
+-- Dependencies: 231
+-- Name: TABLE sales_dashboard; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT ON TABLE public.sales_dashboard TO alltech_user;
+
+
+--
+-- TOC entry 2192 (class 826 OID 17289)
+-- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: public; Owner: postgres
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT,USAGE ON SEQUENCES TO alltech_user;
+
+
+--
+-- TOC entry 2193 (class 826 OID 17290)
+-- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: public; Owner: postgres
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO alltech_user;
+
+
+--
+-- TOC entry 2191 (class 826 OID 17288)
+-- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: postgres
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT,INSERT,DELETE,UPDATE ON TABLES TO alltech_user;
+
+
+-- Completed on 2025-07-19 13:09:56
+
+--
+-- PostgreSQL database dump complete
+--
+
