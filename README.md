@@ -1,141 +1,163 @@
 # 🚀 AllTech Digital
 
-> **Soluções Inteligentes em Tecnologia**
-
-Site institucional da AllTech Digital, uma empresa especializada em soluções tecnológicas personalizadas para empresas que desejam investir em tecnologia de forma inteligente.
+> Site institucional com formulário de contato integrado a banco PostgreSQL e envio de emails via SendGrid.
 
 ## 📋 Sobre o Projeto
 
-O AllTech Digital é um site moderno e responsivo desenvolvido com Next.js, oferecendo uma experiência de usuário excepcional para apresentar nossos serviços e soluções tecnológicas.
+Aplicação Next.js (App Router) com foco em segurança: CSRF, rate limiting, detecção básica de ameaças e headers de segurança. O backend expõe endpoints para obtenção de token CSRF e envio do formulário de contato, persistindo dados no PostgreSQL e disparando emails via SendGrid.
 
-### ✨ Características
+## 🛠️ Tecnologias
 
-- **Design Moderno**: Interface limpa e profissional
-- **Responsivo**: Otimizado para todos os dispositivos
-- **Performance**: Desenvolvido com Next.js para máxima velocidade
-- **SEO Otimizado**: Estrutura preparada para mecanismos de busca
-- **Acessibilidade**: Seguindo as melhores práticas de acessibilidade web
+- Next.js 15, React 18, TypeScript
+- Tailwind CSS, PostCSS
+- PostgreSQL (driver `pg`)
+- SendGrid (`@sendgrid/mail`)
+- Zod (validações)
 
-## 🛠️ Tecnologias Utilizadas
+## 🚀 Como rodar
 
-- **[Next.js 15](https://nextjs.org/)** - Framework React para produção
-- **[React 18](https://reactjs.org/)** - Biblioteca JavaScript para interfaces
-- **[TypeScript](https://www.typescriptlang.org/)** - Tipagem estática para JavaScript
-- **[Tailwind CSS](https://tailwindcss.com/)** - Framework CSS utilitário
-- **[PostCSS](https://postcss.org/)** - Ferramenta para transformar CSS
-- **[ESLint](https://eslint.org/)** - Linter para JavaScript/TypeScript
-
-## 🚀 Como Executar o Projeto
-
-### Pré-requisitos
-
-- Node.js 18+ 
-- npm, yarn, pnpm ou bun
-
-### Instalação
-
-1. **Clone o repositório**
-   ```bash
-   git clone https://github.com/seu-usuario/alltech-digital.git
-   cd alltech-digital
-   ```
-
-2. **Instale as dependências**
-   ```bash
-   npm install
-   # ou
-   yarn install
-   # ou
-   pnpm install
-   ```
-
-3. **Execute o servidor de desenvolvimento**
-   ```bash
-   npm run dev
-   # ou
-   yarn dev
-   # ou
-   pnpm dev
-   ```
-
-4. **Acesse o projeto**
-   Abra [http://localhost:3000](http://localhost:3000) no seu navegador
-
-## 📁 Estrutura do Projeto
-
-```
-alltech-digital/
-├── public/                 # Arquivos estáticos
-├── src/
-│   ├── app/               # App Router do Next.js
-│   │   ├── layout.tsx     # Layout principal
-│   │   ├── page.tsx       # Página inicial
-│   │   └── globals.css    # Estilos globais
-│   ├── components/        # Componentes React
-│   │   ├── Header.tsx
-│   │   ├── HeroSection.tsx
-│   │   ├── ServicesGrid.tsx
-│   │   ├── ValueProposition.tsx
-│   │   ├── TestimonialsSection.tsx
-│   │   ├── ContactForm.tsx
-│   │   └── Footer.tsx
-│   └── lib/               # Utilitários
-│       └── utils.ts
-├── tailwind.config.ts     # Configuração do Tailwind CSS
-├── next.config.js         # Configuração do Next.js
-└── package.json           # Dependências do projeto
-```
-
-## 🎨 Componentes Principais
-
-- **Header**: Navegação principal do site
-- **HeroSection**: Seção de destaque com call-to-action
-- **ServicesGrid**: Grid de serviços oferecidos
-- **ValueProposition**: Proposta de valor da empresa
-- **TestimonialsSection**: Depoimentos de clientes
-- **ContactForm**: Formulário de contato
-- **Footer**: Rodapé com informações de contato
-
-## 📦 Scripts Disponíveis
+### 1) Clonar e instalar
 
 ```bash
-npm run dev      # Inicia o servidor de desenvolvimento
-npm run build    # Cria a build de produção
-npm run start    # Inicia o servidor de produção
-npm run lint     # Executa o linter
+git clone https://github.com/JV-L0pes/AllTech-Site.git
+cd AllTech-Site
+npm install
 ```
 
-## 🌐 Deploy
+### 2) Configurar variáveis de ambiente
 
-### Vercel (Recomendado)
-O projeto está otimizado para deploy na Vercel:
+Crie um arquivo `.env.local` na raiz com, no mínimo:
 
-1. Conecte seu repositório GitHub à Vercel
-2. A Vercel detectará automaticamente que é um projeto Next.js
-3. O deploy será feito automaticamente a cada push
+```env
+DATABASE_URL=postgresql://USUARIO:SENHA@localhost:5432/alltech_digital
+SENDGRID_API_KEY=SEU_TOKEN_SENDGRID
+SENDGRID_FROM_EMAIL=seu-email-verificado@dominio.com
+CSRF_SECRET=uma_chave_aleatoria_segura
+NEXT_PUBLIC_DOMAIN=http://localhost:3000
+```
 
-### Outras Plataformas
-O projeto também pode ser deployado em:
-- Netlify
-- Railway
-- Heroku
-- AWS Amplify
+- Não versione `.env.local`.
+- Para produção use uma URL de banco com SSL quando necessário.
+
+### 3) Banco de dados
+
+- Certifique-se de ter um PostgreSQL rodando e um banco chamado `alltech_digital`.
+- Opcional: importe o dump fornecido no arquivo `alltech_digital_bd` (ajuste o comando conforme a extensão real):
+  - Se for `.sql`: `psql -U postgres -d alltech_digital -f alltech_digital_bd`
+  - Se for dump custom: `pg_restore -U postgres -d alltech_digital alltech_digital_bd`
+
+### 4) Desenvolvimento
+
+```bash
+npm run dev
+# abra http://localhost:3000
+```
+
+### 5) Produção
+
+```bash
+npm run build
+npm run start
+```
+
+## 🔐 Segurança e Fluxo CSRF
+
+O middleware aplica rate limit e validação CSRF básica. O endpoint `/api/csrf` gera um token e define cookies seguros. Para enviar o formulário:
+
+1) Obtenha o token CSRF
+
+```bash
+curl -i -c cookies.txt -H "Origin: http://localhost:3000" http://localhost:3000/api/csrf
+```
+
+Anote `csrfToken` do JSON de resposta e mantenha os cookies salvos em `cookies.txt`.
+
+2) Envie o formulário para `/api/contact` usando o header `x-csrf-token` e os cookies:
+
+```bash
+curl -i -b cookies.txt -H "Origin: http://localhost:3000" -H "Content-Type: application/json" \
+  -H "x-csrf-token: COLoque_O_TOKEN_AQUI" \
+  -X POST http://localhost:3000/api/contact \
+  -d '{
+    "name": "João da Silva",
+    "email": "joao@exemplo.com",
+    "serviceOfInterest": "Migração para Microsoft 365",
+    "message": "Gostaria de um orçamento."
+  }'
+```
+
+Observações:
+- Origens permitidas na API: `http://localhost:3000`, `https://localhost:3000` e `NEXT_PUBLIC_DOMAIN`.
+- Se testar via Postman/Insomnia, defina o header `Origin` como `http://localhost:3000` ou ajuste a whitelist no handler.
+
+## 📡 Endpoints
+
+- `GET /api/csrf`: gera token CSRF e define cookies (`__csrf_hash`, `__csrf_expires`).
+- `POST /api/contact`: valida input (Zod), verifica CSRF, cria lead no banco e envia emails (se SendGrid configurado).
+- `GET /api/contact`: health check (verifica conectividade com o banco).
+
+Campos aceitos em `/api/contact` (principais):
+- `name` (obrigatório)
+- `email` (obrigatório)
+- `serviceOfInterest` (obrigatório; um dentre: Migração para Microsoft 365, Treinamentos Microsoft, Consultoria em Cloud, Automação de Processos, Diagnóstico Gratuito, Outros)
+- `message` (obrigatório)
+- Opcionais: `company`, `phone` (formato (11) 99999-9999), `cnpj` (11.222.333/0001-81), `numberOfEmployees`, `state` (UF), `city`.
+
+## 📦 Scripts NPM
+
+```bash
+npm run dev                 # desenvolvimento
+npm run build               # build de produção
+npm run start               # servidor de produção
+npm run lint                # linter
+npm run type-check          # checagem de tipos
+
+# segurança e dependências
+npm run security:audit      # audit nível moderate
+npm run security:audit-fix  # tenta corrigir
+npm run security:outdated   # pacotes desatualizados
+npm run security:check-updates
+npm run security:full-audit
+npm run security:dependency-check
+```
+
+## 🌐 Deploy (Vercel recomendado)
+
+1. Conecte o repositório `JV-L0pes/AllTech-Site`.
+2. Configure as variáveis no painel (DATABASE_URL, SENDGRID_API_KEY, SENDGRID_FROM_EMAIL, CSRF_SECRET, NEXT_PUBLIC_DOMAIN).
+3. Deploy automático a cada push no branch selecionado.
+
+## 📁 Estrutura resumida
+
+```
+src/
+  app/
+    api/
+      csrf/route.ts     # gera token CSRF
+      contact/route.ts  # valida/insere lead e envia emails
+    layout.tsx, page.tsx, globals.css
+  components/           # UI (Header, Hero, Services, ContactForm, etc.)
+  lib/
+    database.ts         # conexão PostgreSQL
+    email-service.ts    # envio (SendGrid)
+    validations.ts      # Zod schema do contato
+  middleware.ts         # rate limit + segurança básica
+```
 
 ## 🤝 Contribuição
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-   
+```bash
+git checkout -b feature/sua-feature
+git commit -m "sua mensagem"
+git push origin feature/sua-feature
+# abra um PR
+```
+
 ## 📞 Contato
 
-**AllTech Digital**
 - Email: joao.rosa@alltechbr.solutions
-- Website: [alltechdigital.com](#)
-- LinkedIn: [AllTech Digital](https://www.linkedin.com/company/alltechdigital/posts/?feedView=all)
+- LinkedIn: AllTech Digital
 
 ---
 
-**Desenvolvido com ❤️ pela equipe AllTech Digital**
+Desenvolvido com ❤️ pela equipe AllTech Digital
