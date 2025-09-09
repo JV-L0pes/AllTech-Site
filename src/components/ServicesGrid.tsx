@@ -245,11 +245,11 @@ export default function ServicesGrid() {
         <div className="mb-16 space-y-8">
           {/* Primeira linha: Serviços 0 e 1 */}
           <div>
-            <div className="grid lg:grid-cols-2 gap-8">
+            <div className="grid lg:grid-cols-2 gap-8 lg:grid-rows-[1fr]">
               {/* Migração Microsoft 365 */}
-              <div className="relative">
+              <div className="relative flex">
                 <div
-                  className={`card-hover bg-gray-50 rounded-2xl p-8 border-2 transition-all duration-300 cursor-pointer group ${
+                  className={`card-hover bg-gray-50 rounded-2xl p-8 border-2 transition-all duration-300 cursor-pointer group flex flex-col w-full ${
                     activeService === 0
                       ? "border-tech-gradient shadow-xl shadow-tech-gradient/20 scale-105"
                       : "border-gray-300 hover:border-tech-gradient/50"
@@ -280,12 +280,6 @@ export default function ServicesGrid() {
                     </div>
                   </div>
 
-                  {/* Destaque de preço */}
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
-                    <p className="text-green-800 text-sm font-semibold">
-                      💰 Solução sob medida para sua empresa | ⏱️ 2-6 semanas
-                    </p>
-                  </div>
 
                   {/* Descrição */}
                   <p className="text-gray-600 leading-relaxed mb-6">
@@ -293,7 +287,7 @@ export default function ServicesGrid() {
                   </p>
 
                   {/* Lista de features */}
-                  <div className="space-y-3">
+                  <div className="space-y-3 flex-grow">
                     {servicesData[0].features.map((feature, featureIndex) => (
                       <div
                         key={featureIndex}
@@ -311,7 +305,7 @@ export default function ServicesGrid() {
                   </div>
 
                   {/* Botão de ação */}
-                  <div className="mt-6 pt-6 border-t border-gray-300">
+                  <div className="pt-6 border-t border-gray-300 mt-auto">
                     <button 
                       className="btn-secondary w-full hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
                       onClick={(e) => {
@@ -331,9 +325,9 @@ export default function ServicesGrid() {
               </div>
 
               {/* Treinamentos Microsoft */}
-              <div className="relative">
+              <div className="relative flex">
                 <div
-                  className={`card-hover bg-gray-50 rounded-2xl p-8 border-2 transition-all duration-300 cursor-pointer group ${
+                  className={`card-hover bg-gray-50 rounded-2xl p-8 border-2 transition-all duration-300 cursor-pointer group flex flex-col w-full ${
                     activeService === 1
                       ? "border-tech-gradient shadow-xl shadow-tech-gradient/20 scale-105"
                       : "border-gray-300 hover:border-tech-gradient/50"
@@ -363,7 +357,7 @@ export default function ServicesGrid() {
                   </p>
 
                   {/* Lista de features */}
-                  <div className="space-y-3">
+                  <div className="space-y-3 flex-grow">
                     {servicesData[1].features.map((feature, featureIndex) => (
                       <div
                         key={featureIndex}
@@ -381,7 +375,7 @@ export default function ServicesGrid() {
                   </div>
 
                   {/* Botão de ação */}
-                  <div className="mt-6 pt-6 border-t border-gray-300">
+                  <div className="pt-6 border-t border-gray-300 mt-auto">
                     <button 
                       className="btn-secondary w-full hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
                       onClick={(e) => {
@@ -415,11 +409,11 @@ export default function ServicesGrid() {
 
           {/* Segunda linha: Serviços 2 e 3 */}
           <div>
-            <div className="grid lg:grid-cols-2 gap-8">
+            <div className="grid lg:grid-cols-2 gap-8 lg:grid-rows-[1fr]">
               {/* Consultoria Cloud */}
-              <div className="relative">
+              <div className="relative flex">
                 <div
-                  className={`card-hover bg-gray-50 rounded-2xl p-8 border-2 transition-all duration-300 cursor-pointer group ${
+                  className={`card-hover bg-gray-50 rounded-2xl p-8 border-2 transition-all duration-300 cursor-pointer group flex flex-col w-full ${
                     activeService === 2
                       ? "border-tech-gradient shadow-xl shadow-tech-gradient/20 scale-105"
                       : "border-gray-300 hover:border-tech-gradient/50"
@@ -449,7 +443,7 @@ export default function ServicesGrid() {
                   </p>
 
                   {/* Lista de features */}
-                  <div className="space-y-3">
+                  <div className="space-y-3 flex-grow">
                     {servicesData[2].features.map((feature, featureIndex) => (
                       <div
                         key={featureIndex}
@@ -467,7 +461,7 @@ export default function ServicesGrid() {
                   </div>
 
                   {/* Botão de ação */}
-                  <div className="mt-6 pt-6 border-t border-gray-300">
+                  <div className="pt-6 border-t border-gray-300 mt-auto">
                     <button 
                       className="btn-secondary w-full hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
                       onClick={(e) => {
@@ -487,9 +481,9 @@ export default function ServicesGrid() {
               </div>
 
               {/* Automação de Processos */}
-              <div className="relative">
+              <div className="relative flex">
                 <div
-                  className={`card-hover bg-gray-50 rounded-2xl p-8 border-2 transition-all duration-300 cursor-pointer group ${
+                  className={`card-hover bg-gray-50 rounded-2xl p-8 border-2 transition-all duration-300 cursor-pointer group flex flex-col w-full ${
                     activeService === 3
                       ? "border-tech-gradient shadow-xl shadow-tech-gradient/20 scale-105"
                       : "border-gray-300 hover:border-tech-gradient/50"
@@ -519,7 +513,7 @@ export default function ServicesGrid() {
                   </p>
 
                   {/* Lista de features */}
-                  <div className="space-y-3">
+                  <div className="space-y-3 flex-grow">
                     {servicesData[3].features.map((feature, featureIndex) => (
                       <div
                         key={featureIndex}
@@ -537,7 +531,7 @@ export default function ServicesGrid() {
                   </div>
 
                   {/* Botão de ação */}
-                  <div className="mt-6 pt-6 border-t border-gray-300">
+                  <div className="pt-6 border-t border-gray-300 mt-auto">
                     <button 
                       className="btn-secondary w-full hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
                       onClick={(e) => {
